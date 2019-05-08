@@ -1,0 +1,78 @@
+---
+title: "drfit-examples"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{drfit-examples}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(drfit)
+```
+
+
+
+#fname = "/path/to/file"
+#fdata = readr::read_csv(fname)
+#fdata = readxl::read_excel(fname)
+#names(fdata)
+#View(fdata)
+
+
+
+
+
+
+##SET the model formula here
+drc.formula = effect ~ 100 / (1 + 10^((logEC50-logconc) * slope))
+
+#if you want to adapt the dose repsonse curve to the maximum and minimum effect values, use this code instead
+#loe = min(data$effect)
+#hie = max(data$effect)
+#drc.formula = substitute(effect ~ bottom + ((top-bottom)/(1+10^((logEC50-logconc)*slope))),list(top = hie, bottom=loe))
+
+#example data
+
+sdata = as_tibble(
+  data.frame(
+    conc=c(1,10,100,1000,5000),
+    effect=c(12,27,69,86,98)
+  ))
+
+
+data.logged = sdata %>% mutate(logconc = log10(conc))
+
+fitObject = drfit(drc.formula,data.logged)
+summary(fitObject$curve.fit)
+plot_single_drc(fitObject) + xlab("log(concentration)") + ylab("effect")
+
+#ggsave("/path/to/image.png",p,width="8",height="6",units="in")
+
+# reporting goodness of fit
+# R^2 is considered inadequate for nonlinear fits
+# https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2892436/
+# use akaike's An Information Criterion(AIC) instead
+
+
+
+#plot your model fit
+
+
+
+mdata = as_tibble(
+  data.frame(
+    conc=c(1,10,100,1000,5000),
+    effectA=c(12,27,69,86,98),
+    effectB=c(15,23,64,82,91)
+  ))
+
+fo = drfit::drfit_multi(drc.formula,mdata,2:3,conc)
+plot_multi_drc(fo,plot.layout='multi')
