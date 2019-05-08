@@ -15,6 +15,8 @@ drfit(m.formula, fdata, level = 0.95, start = vector(),
 \item{level}{Level of confidence interval to use (0.95 by default). [0,1]}
 
 \item{start}{initial parameter values for the dose response fitting. c(logEC50,slope)}
+
+\item{verbose}{logical, prints intermediate results if true}
 }
 \description{
 Dose Response curve fit

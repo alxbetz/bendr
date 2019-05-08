@@ -4,7 +4,7 @@
 \alias{plot_multi_drc}
 \title{Plot multiple dose response curves}
 \usage{
-plot_multi_drc(fit_df, plot.shape = "single")
+plot_multi_drc(fit_df, plot.layout = "single")
 }
 \arguments{
 \item{fit_df}{data frame containing the model fits in the column m.fit}

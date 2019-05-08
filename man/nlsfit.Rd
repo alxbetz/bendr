@@ -2,7 +2,7 @@
 % Please edit documentation in R/fitting.R
 \name{nlsfit}
 \alias{nlsfit}
-\title{2 stage nonlinear least squares fit}
+\title{two stage nonlinear least squares fit}
 \usage{
 nlsfit(m.formula, start, fdata)
 }
@@ -17,5 +17,5 @@ nlsfit(m.formula, start, fdata)
 nls2 fit object
 }
 \description{
-2 stage nonlinear least squares fit
+two stage nonlinear least squares fit
 }

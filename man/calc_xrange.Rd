@@ -7,7 +7,9 @@
 calc_xrange(m.formula, fdata)
 }
 \arguments{
-\item{fdata}{}
+\item{m.formula}{model formula}
+
+\item{fdata}{dataframe with concentration values}
 }
 \description{
 Calculate a vector of x-values for plotting

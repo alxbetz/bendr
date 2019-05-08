@@ -1,5 +1,5 @@
 ---
-title: "drfit-examples"
+title: "Dose response curve fitting examples"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{drfit-examples}
@@ -16,37 +16,53 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(drfit)
+library(tibble)
+library(dplyr)
+library(ggplot2)
 ```
 
 
+You can read your data from csv,tsv or excel:
+```{r datai,eval=FALSE}
+fname = "/path/to/file"
+require(readr)
+fdata = readr::read_csv(fname)
+fdata = readr::read_tsv(fname)
+require(readxl)
+fdata = readxl::read_excel(fname)
+names(fdata)
+View(fdata)
+```
 
-#fname = "/path/to/file"
-#fdata = readr::read_csv(fname)
-#fdata = readxl::read_excel(fname)
-#names(fdata)
-#View(fdata)
 
-
-
-
-
-
-##SET the model formula here
-drc.formula = effect ~ 100 / (1 + 10^((logEC50-logconc) * slope))
-
-#if you want to adapt the dose repsonse curve to the maximum and minimum effect values, use this code instead
-#loe = min(data$effect)
-#hie = max(data$effect)
-#drc.formula = substitute(effect ~ bottom + ((top-bottom)/(1+10^((logEC50-logconc)*slope))),list(top = hie, bottom=loe))
-
-#example data
-
+But for a quick test, we generate some dummy data:
+```{r dummydata}
 sdata = as_tibble(
   data.frame(
     conc=c(1,10,100,1000,5000),
     effect=c(12,27,69,86,98)
   ))
+```
 
+then we set the formula for the dose response model
+
+```{r formula100}
+##SET the model formula here
+drc.formula = effect ~ 100 / (1 + 10^((logEC50-logconc) * slope))
+```
+
+if you want to adapt the dose response curve to the maximum and minimum effect values, use this formula instead
+
+```{r formula.dyn}
+loe = min(sdata$effect)
+hie = max(sdata$effect)
+drc.formula.dyn = substitute(effect ~ bottom + ((top-bottom)/(1+10^((logEC50-logconc)*slope))),list(top = hie, bottom=loe))
+```
+
+
+
+Here is an example for fitting a single dose-response curve
+```{r singlefit}
 
 data.logged = sdata %>% mutate(logconc = log10(conc))
 
@@ -55,17 +71,15 @@ summary(fitObject$curve.fit)
 plot_single_drc(fitObject) + xlab("log(concentration)") + ylab("effect")
 
 #ggsave("/path/to/image.png",p,width="8",height="6",units="in")
+```
 
-# reporting goodness of fit
-# R^2 is considered inadequate for nonlinear fits
-# https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2892436/
-# use akaike's An Information Criterion(AIC) instead
-
-
-
-#plot your model fit
+###Reporting goodness of fit
+ R^2 is considered inadequate for nonlinear fits (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2892436/)
+ Instead, use akaike's An Information Criterion(AIC). (Note that a higher AIC value indicates a better fit)
 
 
+
+```{r multifit}
 
 mdata = as_tibble(
   data.frame(
@@ -76,3 +90,4 @@ mdata = as_tibble(
 
 fo = drfit::drfit_multi(drc.formula,mdata,2:3,conc)
 plot_multi_drc(fo,plot.layout='multi')
+```

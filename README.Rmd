@@ -1,0 +1,50 @@
+---
+title: "README"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+#Installation
+
+##Via github
+
+1. make sure that devtools is installed
+
+```{r installdevt,eval=FALSE}
+install.packages('devtools')
+```
+
+then execute
+
+```{r install,eval=FALSE}
+require(devtools)
+devtools::install_github('alxbetz/drfit')
+```
+
+if you see an error about libssh2 missing, on UNIX based systems, you need to install libssh2 and on Windows, it is recommended to just update the 'git2r' package(update.packages('git2r'))
+
+##Installing libssh2
+###On linux
+Use your favourite package manager(e.g. APT,yum) 
+
+```{bash libssh2lin,eval=FALSE}
+sudo apt-get install libssh2-1 libssh2-1-dev
+sudo yum install libssh2
+```
+
+###On mac OS
+First install Homebrew, a package manager for OS X
+```{bash homebrew,eval=FALSE}
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" < /dev/null 2> /dev/null
+```
+
+then install libssh2 via homebrew
+
+```{bash libssh2brew,eval=FALSE}
+brew install libssh2
+```
+

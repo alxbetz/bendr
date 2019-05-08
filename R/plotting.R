@@ -1,7 +1,3 @@
-require(tidyr)
-require(ggplot2)
-require(dplyr)
-
 
 #' Plot a single dose response curve
 #'
@@ -9,7 +5,7 @@ require(dplyr)
 #' drfit result object
 #'
 #' @return
-#' ggplot object
+#' @import ggplot2
 #' @export
 #'
 #' @examples
@@ -32,17 +28,19 @@ plot_single_drc = function(fitObject) {
 #'
 #' @return
 #' ggplot object
+#' @import dplyr
+#' @import ggplot2
 #' @export
 #'
 #' @examples
 plot_multi_drc = function(fit_df,plot.layout = "single") {
   plotdata = fit_df %>%
     dplyr::pull(m.fit) %>%
-    map(function(x) x$plot.data)
+    purrr::map(function(x) x$plot.data)
   names(plotdata) = fit_df %>% dplyr::pull(sampleID)
-  plotLong = bind_rows(plotdata,.id = "sampleID")
+  plotLong = dplyr::bind_rows(plotdata,.id = "sampleID")
 
-  rawdata = fit_df %>% dplyr::select(sampleID,data) %>% unnest()
+  rawdata = fit_df %>% dplyr::select(sampleID,data) %>% tidyr::unnest()
 
   if(plot.layout == 'single') {
     p = ggplot(plotLong,aes(x=log.concentration,color=sampleID)) +

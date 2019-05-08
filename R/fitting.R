@@ -1,10 +1,4 @@
-require(nls2)
-require(nlmrt)
-require(dplyr)
-require(tidyr)
-require(purrr)
-
-#' 2 stage nonlinear least squares fit
+#' two stage nonlinear least squares fit
 #'
 #' @param m.formula
 #' model formula
@@ -19,11 +13,11 @@ require(purrr)
 #'
 #' @examples
 nlsfit = function(m.formula,start,fdata) {
-  fit1 = nlxb(m.formula,
+  fit1 = nlmrt::nlxb(m.formula,
               start = start,
               trace = FALSE,
               data = fdata)
-  curvefit <- nls2(m.formula, data = fdata, start = fit1$coefficients,
+  curvefit <- nls2::nls2(m.formula, data = fdata, start = fit1$coefficients,
                    algorithm = "brute-force")
   curvefit
 }
@@ -60,7 +54,7 @@ calc_ci = function(m.formula,x.values,curvefit,curve.predict,dof,level = 0.95) {
   covmatrix= vcov(curvefit)
 
   # get the jacobian for all x.values
-  residual.jacfun = model2jacfun(m.formula,coef(curvefit))
+  residual.jacfun = nlmrt::model2jacfun(m.formula,coef(curvefit))
   nameY = all.vars(m.formula)[1]
   nameX = all.vars(m.formula)[3]
   paramY = list(curve.predict)
@@ -93,6 +87,8 @@ calc_ci = function(m.formula,x.values,curvefit,curve.predict,dof,level = 0.95) {
 #' Level of confidence interval to use (0.95 by default). [0,1]
 #' @param start
 #' initial parameter values for the dose response fitting. c(logEC50,slope)
+#' @param verbose
+#' logical, prints intermediate results if true
 #'
 #' @return
 #' @export
@@ -113,7 +109,7 @@ drfit = function(m.formula,fdata,level=0.95,start=vector(),verbose=FALSE) {
     if(dependentV[length(dependentV)] - dependentV[1] < 0 ) {
       slopeGuess = - slopeGuess
     }
-    start = c(logEC50 = median(pull(fdata,concName)), slope = slopeGuess)
+    start = c(logEC50 = median(dplyr::pull(fdata,concName)), slope = slopeGuess)
     if(verbose) {
       print("Initial values are")
       print(start)
@@ -151,15 +147,20 @@ drfit = function(m.formula,fdata,level=0.95,start=vector(),verbose=FALSE) {
 #' name of the concentration column; this parameter is lazily evaluated, so do not use quotes
 #'
 #' @return
+#' @import rlang
+#' @import dplyr
 #' @export
 #'
 #' @examples
 drfit_multi= function(m.formula,fdata,effectColumns,concColumn) {
   quo_concColumn = enquo(concColumn)
-  data.proc = fdata %>% mutate(logconc := log10(!! quo_concColumn))
+  data.proc = fdata %>% dplyr::mutate(logconc := log10(!! quo_concColumn))
   data.long = data.proc %>% tidyr::gather(sampleID,effect,effectColumns)
-  data.fit = data.long %>% dplyr::group_by(sampleID) %>% nest() %>%
-    dplyr::mutate(m.fit = map(data,drfit,m.formula = m.formula)) %>%
-    dplyr::mutate(ec50=map_dbl(m.fit,function(mod) 10^(coefficients(mod$curve.fit)[1])),slope=map_dbl(m.fit,function(mod) coefficients(mod$curve.fit)[2]))
+  data.fit = data.long %>% dplyr::group_by(sampleID) %>% tidyr::nest() %>%
+    dplyr::mutate(m.fit = purrr::map(data,drfit,m.formula = m.formula)) %>%
+    dplyr::mutate(
+      ec50=purrr::map_dbl(m.fit,function(mod) 10^(coefficients(mod$curve.fit)[1])),
+      slope=purrr::map_dbl(m.fit,function(mod) coefficients(mod$curve.fit)[2]),
+      aic=purrr::map_dbl(m.fit,function(mod) mod$aic))
   data.fit
 }
