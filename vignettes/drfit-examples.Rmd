@@ -1,5 +1,7 @@
 ---
 title: "Dose response curve fitting examples"
+author: "Alexander Betz"
+date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{drfit-examples}
@@ -75,7 +77,7 @@ plot_single_drc(fitObject) + xlab("log(concentration)") + ylab("effect")
 
 ###Reporting goodness of fit
  R^2 is considered inadequate for nonlinear fits (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2892436/)
- Instead, use akaike's An Information Criterion(AIC). (Note that a higher AIC value indicates a better fit)
+ Instead, use akaike's An Information Criterion(AIC).
 
 
 

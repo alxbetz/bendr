@@ -154,8 +154,8 @@ drfit = function(m.formula,fdata,level=0.95,start=vector(),verbose=FALSE) {
 #' @examples
 drfit_multi= function(m.formula,fdata,effectColumns,concColumn) {
   quo_concColumn = enquo(concColumn)
-  data.proc = fdata %>% dplyr::mutate(logconc := log10(!! quo_concColumn))
-  data.long = data.proc %>% tidyr::gather(sampleID,effect,effectColumns)
+  data.logged = fdata %>% dplyr::mutate(logconc := log10(!! quo_concColumn))
+  data.long = data.logged %>% tidyr::gather(sampleID,effect,effectColumns)
   data.fit = data.long %>% dplyr::group_by(sampleID) %>% tidyr::nest() %>%
     dplyr::mutate(m.fit = purrr::map(data,drfit,m.formula = m.formula)) %>%
     dplyr::mutate(
