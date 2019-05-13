@@ -4,7 +4,7 @@ author: "Alexander Betz"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{drfit-examples}
+  %\VignetteIndexEntry{bendr-examples}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -16,8 +16,8 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(drfit)
+```{r setup,message=FALSE,warning=FALSE}
+library(bendr)
 library(tibble)
 library(dplyr)
 library(ggplot2)
@@ -49,7 +49,6 @@ sdata = as_tibble(
 then we set the formula for the dose response model
 
 ```{r formula100}
-##SET the model formula here
 drc.formula = effect ~ 100 / (1 + 10^((logEC50-logconc) * slope))
 ```
 
@@ -58,7 +57,9 @@ if you want to adapt the dose response curve to the maximum and minimum effect v
 ```{r formula.dyn}
 loe = min(sdata$effect)
 hie = max(sdata$effect)
-drc.formula.dyn = substitute(effect ~ bottom + ((top-bottom)/(1+10^((logEC50-logconc)*slope))),list(top = hie, bottom=loe))
+drc.formula.dyn = substitute(
+  effect ~ bottom + ((top-bottom)/(1+10^((logEC50-logconc)*slope))),
+  list(top = hie, bottom=loe))
 ```
 
 
@@ -68,18 +69,18 @@ Here is an example for fitting a single dose-response curve
 
 data.logged = sdata %>% mutate(logconc = log10(conc))
 
-fitObject = drfit(drc.formula,data.logged)
+fitObject = bendr::drfit(drc.formula,data.logged)
 summary(fitObject$curve.fit)
-plot_single_drc(fitObject) + xlab("log(concentration)") + ylab("effect")
-
-#ggsave("/path/to/image.png",p,width="8",height="6",units="in")
+pSingle = plot_single_drc(fitObject) + xlab("log(concentration)") + ylab("effect")
+pSingle 
+#ggsave("/path/to/image.png",pSingle,width="8",height="6",units="in")
 ```
 
 ###Reporting goodness of fit
  R^2 is considered inadequate for nonlinear fits (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2892436/)
  Instead, use akaike's An Information Criterion(AIC).
 
-
+##Fitting multiple dose response curves simulatneously
 
 ```{r multifit}
 
@@ -90,6 +91,7 @@ mdata = as_tibble(
     effectB=c(15,23,64,82,91)
   ))
 
-fo = drfit::drfit_multi(drc.formula,mdata,2:3,conc)
-plot_multi_drc(fo,plot.layout='multi')
+fo = drfit_multi(drc.formula,mdata,2:3,conc)
+pMulti = plot_multi_drc(fo,plot.layout='multi')
+pMulti
 ```

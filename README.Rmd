@@ -17,17 +17,24 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r installdevt,eval=FALSE}
 install.packages('devtools')
 ```
+####On Windows:
+there is a known bug that R freezes when installing the package 'BH' automatically, as a dependency of ggplot. Therefore, install it manually by running the the following command first.
+```{r bhwindows,eval=FALSE}
+install.packages('BH')
+```
 
 then execute
 
 ```{r install,eval=FALSE}
 require(devtools)
-devtools::install_github('alxbetz/drfit')
+devtools::install_github('alxbetz/bendr')
 ```
 
-if you see an error about libssh2 missing, on UNIX based systems, you need to install libssh2 and on Windows, it is recommended to just update the 'git2r' package(update.packages('git2r'))
 
-##Installing libssh2
+##Troubleshooting
+If you see an error about libssh2 missing, on UNIX based systems, you need to install libssh2 and on Windows, it is recommended to just update the 'git2r' package(update.packages('git2r'))
+
+###Installing libssh2
 ###On linux
 Use your favourite package manager(e.g. APT,yum) 
 

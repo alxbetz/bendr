@@ -201,13 +201,21 @@ $(document).ready(function () {
 <li>make sure that devtools is installed</li>
 </ol>
 <pre class="r"><code>install.packages('devtools')</code></pre>
+<div id="on-windows" class="section level4">
+<h4>On Windows:</h4>
+<p>there is a known bug that R freezes when installing the package ‘BH’ automatically, as a dependency of ggplot. Therefore, install it manually by running the the following command first.</p>
+<pre class="r"><code>install.packages('BH')</code></pre>
 <p>then execute</p>
 <pre class="r"><code>require(devtools)
-devtools::install_github('alxbetz/drfit')</code></pre>
-<p>if you see an error about libssh2 missing, on UNIX based systems, you need to install libssh2 and on Windows, it is recommended to just update the ‘git2r’ package(update.packages(‘git2r’))</p>
+devtools::install_github('alxbetz/bendr')</code></pre>
 </div>
-<div id="installing-libssh2" class="section level2">
-<h2>Installing libssh2</h2>
+</div>
+<div id="troubleshooting" class="section level2">
+<h2>Troubleshooting</h2>
+<p>If you see an error about libssh2 missing, on UNIX based systems, you need to install libssh2 and on Windows, it is recommended to just update the ‘git2r’ package(update.packages(‘git2r’))</p>
+<div id="installing-libssh2" class="section level3">
+<h3>Installing libssh2</h3>
+</div>
 <div id="on-linux" class="section level3">
 <h3>On linux</h3>
 <p>Use your favourite package manager(e.g. APT,yum)</p>

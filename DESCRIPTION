@@ -1,4 +1,4 @@
-Package: drfit
+Package: bendr
 Type: Package
 Title: Fits dose-response curves
 Version: 0.1.0
