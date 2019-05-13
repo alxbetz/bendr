@@ -1,4 +1,4 @@
 library(testthat)
-library(drfit)
+library(bendr)
 
-test_check("drfit")
+test_check("bendr")
