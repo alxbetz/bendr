@@ -2,8 +2,8 @@
 
 export(calc_ci)
 export(calc_xrange)
-export(drfit)
-export(drfit_multi)
+export(fitdr)
+export(fitdr_multi)
 export(nlsfit)
 export(plot_multi_drc)
 export(plot_single_drc)

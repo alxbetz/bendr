@@ -94,7 +94,7 @@ calc_ci = function(m.formula,x.values,curvefit,curve.predict,dof,level = 0.95) {
 #' @export
 #'
 #' @examples
-drfit = function(m.formula,fdata,level=0.95,start=vector(),verbose=FALSE) {
+fitdr = function(m.formula,fdata,level=0.95,start=vector(),verbose=FALSE) {
   responseName = all.vars(m.formula)[1]
   concName = all.vars(m.formula)[3]
   if(length(start) == 0) {
@@ -152,12 +152,12 @@ drfit = function(m.formula,fdata,level=0.95,start=vector(),verbose=FALSE) {
 #' @export
 #'
 #' @examples
-drfit_multi= function(m.formula,fdata,effectColumns,concColumn) {
+fitdr_multi= function(m.formula,fdata,effectColumns,concColumn) {
   quo_concColumn = enquo(concColumn)
   data.logged = fdata %>% dplyr::mutate(logconc := log10(!! quo_concColumn))
   data.long = data.logged %>% tidyr::gather(sampleID,effect,effectColumns)
   data.fit = data.long %>% dplyr::group_by(sampleID) %>% tidyr::nest() %>%
-    dplyr::mutate(m.fit = purrr::map(data,drfit,m.formula = m.formula)) %>%
+    dplyr::mutate(m.fit = purrr::map(data,fitdr,m.formula = m.formula)) %>%
     dplyr::mutate(
       ec50=purrr::map_dbl(m.fit,function(mod) 10^(coefficients(mod$curve.fit)[1])),
       slope=purrr::map_dbl(m.fit,function(mod) coefficients(mod$curve.fit)[2]),

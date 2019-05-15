@@ -69,7 +69,7 @@ Here is an example for fitting a single dose-response curve
 
 data.logged = sdata %>% mutate(logconc = log10(conc))
 
-fitObject = bendr::drfit(drc.formula,data.logged)
+fitObject = bendr::fitdr(drc.formula,data.logged)
 summary(fitObject$curve.fit)
 pSingle = plot_single_drc(fitObject) + xlab("log(concentration)") + ylab("effect")
 pSingle 
@@ -91,7 +91,7 @@ mdata = as_tibble(
     effectB=c(15,23,64,82,91)
   ))
 
-fo = drfit_multi(drc.formula,mdata,2:3,conc)
+fo = fitdr_multi(drc.formula,mdata,2:3,conc)
 pMulti = plot_multi_drc(fo,plot.layout='multi')
 pMulti
 ```
