@@ -129,7 +129,9 @@ fitdr = function(m.formula,fdata,level=0.95,start=vector(),verbose=FALSE) {
        data=fdata,
        ec50=10^coefficients(curvefit)[1],
        slope = coefficients(curvefit)[2],
-       aic = AIC(curvefit)
+       aic = AIC(curvefit),
+       xname = concName,
+       yname = responseName
   )
 }
 

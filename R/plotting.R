@@ -11,7 +11,7 @@
 #' @examples
 plot_single_drc = function(fitObject) {
   p = ggplot(fitObject$plot.data, aes(log.concentration, curve.predict)) +
-    geom_point(data=fitObject$data,aes(x=logconc,y=effect)) +
+    geom_point(data=fitObject$data,aes_string(x=fitObject$xname,y=fitObject$yname)) +
     geom_line(aes(y = curve.predict), colour = "red") +
     geom_line(aes(y = curve.predict + ci.values), colour = "red", linetype = 2) +
     geom_line(aes(y = curve.predict - ci.values), colour = "red", linetype = 2)
