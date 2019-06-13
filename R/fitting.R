@@ -121,6 +121,7 @@ fitdr = function(m.formula,fdata,level=0.95,start=vector(),verbose=FALSE) {
   xdf = data.frame(x.values)
   names(xdf) = concName
   curve.predict = predict(curvefit, newdata = xdf)
+
   ci.values = calc_ci(m.formula,x.values,curvefit,curve.predict,dof=nrow(fdata)-2,level=level)
   plot.data = data.frame(log.concentration = x.values,curve.predict = curve.predict,ci.values = ci.values)
   list(plot.data = plot.data ,
@@ -134,6 +135,33 @@ fitdr = function(m.formula,fdata,level=0.95,start=vector(),verbose=FALSE) {
        yname = responseName
   )
 }
+
+
+#' Dose response curve fit with replicates
+#'
+#' @param m.formula
+#' @param fdata
+#' @param effectColumns
+#' @param concColumn
+#' @param level
+#' @param start
+#' @param verbose
+#'
+#' @return
+#' @export
+#'
+#' @examples
+fitdr_replicates= function(m.formula,fdata,effectColumns,concColumn,level=0.95,start=vector(),verbose=F) {
+  quo_concColumn = enquo(concColumn)
+  data.logged = fdata %>% dplyr::mutate(logconc := log10(!! quo_concColumn))
+  data.long = data.logged %>% tidyr::gather(replicateID,effect,effectColumns)
+  data.summ = data.long %>% dplyr::group_by(logconc) %>% dplyr::summarise(mean = mean(effect),n=n(),sd = sd(effect))
+  m.formula = as.formula(stringr::str_replace(deparse(m.formula),'effect','mean'))
+  data.fit = fitdr(m.formula,data.summ,level=level,start=start,verbose=verbose)
+  data.fit$data.long = data.long
+  data.fit
+}
+
 
 
 #' Fit multiple dose response curves

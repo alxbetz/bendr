@@ -10,13 +10,35 @@
 #'
 #' @examples
 plot_single_drc = function(fitObject) {
-  p = ggplot(fitObject$plot.data, aes(log.concentration, curve.predict)) +
-    geom_point(data=fitObject$data,aes_string(x=fitObject$xname,y=fitObject$yname)) +
+  p = ggplot(fitObject$plot.data, aes(x=log.concentration, y=curve.predict)) +
     geom_line(aes(y = curve.predict), colour = "red") +
     geom_line(aes(y = curve.predict + ci.values), colour = "red", linetype = 2) +
-    geom_line(aes(y = curve.predict - ci.values), colour = "red", linetype = 2)
+    geom_line(aes(y = curve.predict - ci.values), colour = "red", linetype = 2) +
+    geom_point(data=fitObject$data,ggplot2::aes_string(x=fitObject$xname,y=fitObject$yname))
+
   p
 }
+
+#' Plot a single dose response curve with standard deviation of replicates
+#'
+#' @param fitObject
+#'
+#' @return
+#' @import ggplot2
+#' @export
+#'
+#' @examples
+plot_replicate_drc = function(fitObject) {
+  p = ggplot(fitObject$plot.data, aes(log.concentration, curve.predict)) +
+    geom_line(aes(y = curve.predict), colour = "red") +
+    geom_line(aes(y = curve.predict + ci.values), colour = "red", linetype = 2) +
+    geom_line(aes(y = curve.predict - ci.values), colour = "red", linetype = 2) +
+    geom_point(data=fitObject$data,aes_string(x=fitObject$xname,y=fitObject$yname)) +
+    geom_errorbar(data=fitObject$data,aes(x=logconc,ymin=mean-sd, ymax=mean+sd), width=.1, position=position_dodge(0.1),inherit.aes = FALSE)
+
+  p
+}
+
 
 #' Plot multiple dose response curves
 #'
@@ -60,6 +82,4 @@ plot_multi_drc = function(fit_df,plot.layout = "single") {
     return(NA)
   }
   p
-
-
 }

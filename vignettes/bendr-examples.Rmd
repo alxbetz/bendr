@@ -44,6 +44,12 @@ sdata = as_tibble(
     conc=c(1,10,100,1000,5000),
     effect=c(12,27,69,86,98)
   ))
+
+sdata = as_tibble(
+  data.frame(
+    conc=c(0.0001,0.001,0.01,0.1,1),
+    effect=c(12,27,69,86,98)
+  ))
 ```
 
 then we set the formula for the dose response model
@@ -94,4 +100,21 @@ mdata = as_tibble(
 fo = fitdr_multi(drc.formula,mdata,2:3,conc)
 pMulti = plot_multi_drc(fo,plot.layout='multi')
 pMulti
+```
+
+##Fitting a single dose response curve to the mean of replicates
+
+
+```{r replifit}
+rdata = as_tibble(
+  data.frame(
+    conc=c(0.1,1,10,100,1000,5000),
+    replicateA=c(1,12,27,65,88,100),
+    replicateB=c(2,16,21,62,81,100),
+    replicateC=c(4,15,21,61,85,96)
+  ))
+
+fitObjectRep = fitdr_replicates(drc.formula,rdata,2:4,conc)
+pRep = plot_replicate_drc(fitObjectRep)
+pRep
 ```
