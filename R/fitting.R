@@ -160,6 +160,7 @@ fitdr_replicates= function(m.formula,fdata,effectColumns,concColumn,level=0.95,s
   browser()
   data.fit = fitdr(m.formula,data.summ,level=level,start=start,verbose=verbose)
   data.fit$data.long = data.long
+  data.fit$nreplicates = length(effectColumns)
   data.fit
 }
 
