@@ -2,6 +2,7 @@
 
 export(calc_ci)
 export(calc_xrange)
+export(findNTC)
 export(fitdr)
 export(fitdr_multi)
 export(fitdr_replicates)

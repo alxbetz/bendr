@@ -155,8 +155,9 @@ fitdr_replicates= function(m.formula,fdata,effectColumns,concColumn,level=0.95,s
   quo_concColumn = enquo(concColumn)
   data.logged = fdata %>% dplyr::mutate(logconc := log10(!! quo_concColumn))
   data.long = data.logged %>% tidyr::gather(replicateID,effect,effectColumns)
-  data.summ = data.long %>% dplyr::group_by(logconc) %>% dplyr::summarise(mean = mean(effect),n=n(),sd = sd(effect))
+  data.summ = data.long %>% dplyr::group_by(logconc) %>% dplyr::summarise(mean = mean(effect,na.rm=T),n=n(),sd = sd(effect,na.rm=T))
   m.formula = as.formula(stringr::str_replace(deparse(m.formula),'effect','mean'))
+  browser()
   data.fit = fitdr(m.formula,data.summ,level=level,start=start,verbose=verbose)
   data.fit$data.long = data.long
   data.fit

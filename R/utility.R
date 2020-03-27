@@ -1,7 +1,3 @@
-require(dplyr)
-
-
-
 #' Calculate a vector of x-values for plotting
 #'
 #' @param m.formula
@@ -21,7 +17,7 @@ calc_xrange = function(m.formula,fdata) {
   if (loc>0){
     x.start = 0
   } else {
-    x.start = 3 * loc
+    x.start = 2 * loc
   }
   x.values = seq(x.start,hic*1.4,length.out=1E3)
 }

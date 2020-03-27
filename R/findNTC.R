@@ -1,8 +1,12 @@
-#' Title
+#' Find the non-toxic concentration.
 #'
-#' @param bendrObj A bendr result object
+#' If you use the result of this calculation in your research, please cite Stadnicka-Michalak et al.
+#' DOI: 10.14573/altex.1701231
+#' @param bendrObj
+#' A bendr result object
 #'
 #' @return
+#' The absolute (non-logged) non-toxic concentration value
 #' @export
 #'
 #' @examples
