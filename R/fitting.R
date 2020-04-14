@@ -137,16 +137,15 @@ fitdr = function(m.formula,fdata,level=0.95,start=vector(),verbose=FALSE,debug=F
   ec10 = calc_ecx(10,slope,ec50)
   logec10 = log10(ec10)
   ci.par = confint2(curvefit)
+  colnames(ci.par) = c('lower','upper')
   ec50.ci = 10^ci.par['logEC50',]
   slope.ci = ci.par['slope',]
-  ec10.ci = c(
-    calc_ecx(10,ci.par['slope',1],ec50.ci[1]),
-    calc_ecx(10,ci.par['slope',2],ec50.ci[2])
-  )
+
 
 
   names(ec50) = c('')
   names(ec10) = c('')
+  names(slope) = c('')
   list(plot.data = plot.data ,
        curve.fit=curvefit,
        confidence.level=level,
@@ -154,7 +153,6 @@ fitdr = function(m.formula,fdata,level=0.95,start=vector(),verbose=FALSE,debug=F
        ec50=ec50,
        ec50.ci = ec50.ci,
        ec10 = ec10,
-       ec10.ci = ec10.ci,
        slope = slope,
        slope.ci = slope.ci,
        aic = AIC(curvefit),
