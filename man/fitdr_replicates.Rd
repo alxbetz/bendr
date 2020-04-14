@@ -5,7 +5,7 @@
 \title{Dose response curve fit with replicates}
 \usage{
 fitdr_replicates(m.formula, fdata, effectColumns, concColumn,
-  level = 0.95, start = vector(), verbose = F)
+  level = 0.95, start = vector(), verbose = F, debug = F)
 }
 \arguments{
 \item{verbose}{}

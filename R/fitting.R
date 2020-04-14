@@ -42,10 +42,11 @@ nlsfit = function(m.formula,start,fdata) {
 #' Level of confidence interval to use (0.95 by default). [0,1]
 #'
 #' @return
+#' Confidence interval values for all concentrations in x.values
 #' @export
 #'
 #' @examples
-calc_ci = function(m.formula,x.values,curvefit,curve.predict,dof,level = 0.95) {
+calc_ci = function(m.formula,x.values,curvefit,curve.predict,dof,level = 0.95,debug=FALSE) {
 
   logEC50.value = coef(curvefit)[1]
   slope.value = coef(curvefit)[2]
@@ -62,11 +63,16 @@ calc_ci = function(m.formula,x.values,curvefit,curve.predict,dof,level = 0.95) {
   names(paramY) = nameY
   names(paramX) = nameX
   residual.jacobian = residual.jacfun(coef(curvefit), paramX, paramY)
+  if(debug) {
+    jac_plot = ggplot(as_tibble(residual.jacobian)) + geom_point(aes(x=logEC50,y=slope))
+    ggsave("./residual_jacobian.png")
+  }
 
   # get the confidence interval for all x_values
   error = residual.jacobian %*% covmatrix %*% t(residual.jacobian)
   error = diag(error)
   error = sqrt(error)
+
   # t for the inverse studen't distribution depends on the number of measurements
   p = 1- ((1-level)/2)
   t_student = qt(p, df =dof)
@@ -91,10 +97,11 @@ calc_ci = function(m.formula,x.values,curvefit,curve.predict,dof,level = 0.95) {
 #' logical, prints intermediate results if true
 #'
 #' @return
+#' @importFrom nlstools confint2
 #' @export
 #'
 #' @examples
-fitdr = function(m.formula,fdata,level=0.95,start=vector(),verbose=FALSE) {
+fitdr = function(m.formula,fdata,level=0.95,start=vector(),verbose=FALSE,debug=FALSE) {
   responseName = all.vars(m.formula)[1]
   concName = all.vars(m.formula)[3]
   if(length(start) == 0) {
@@ -122,14 +129,34 @@ fitdr = function(m.formula,fdata,level=0.95,start=vector(),verbose=FALSE) {
   names(xdf) = concName
   curve.predict = predict(curvefit, newdata = xdf)
 
-  ci.values = calc_ci(m.formula,x.values,curvefit,curve.predict,dof=nrow(fdata)-2,level=level)
+  ci.values = calc_ci(m.formula,x.values,curvefit,curve.predict,dof=nrow(fdata)-2,level=level,debug=debug)
   plot.data = data.frame(log.concentration = x.values,curve.predict = curve.predict,ci.values = ci.values)
+  logec50 = coefficients(curvefit)[1]
+  ec50 = 10^logec50
+  slope = coefficients(curvefit)[2]
+  ec10 = calc_ecx(10,slope,ec50)
+  logec10 = log10(ec10)
+  ci.par = confint2(curvefit)
+  ec50.ci = 10^ci.par['logEC50',]
+  slope.ci = ci.par['slope',]
+  ec10.ci = c(
+    calc_ecx(10,ci.par['slope',1],ec50.ci[1]),
+    calc_ecx(10,ci.par['slope',2],ec50.ci[2])
+  )
+
+
+  names(ec50) = c('')
+  names(ec10) = c('')
   list(plot.data = plot.data ,
        curve.fit=curvefit,
        confidence.level=level,
        data=fdata,
-       ec50=10^coefficients(curvefit)[1],
-       slope = coefficients(curvefit)[2],
+       ec50=ec50,
+       ec50.ci = ec50.ci,
+       ec10 = ec10,
+       ec10.ci = ec10.ci,
+       slope = slope,
+       slope.ci = slope.ci,
        aic = AIC(curvefit),
        xname = concName,
        yname = responseName
@@ -151,14 +178,16 @@ fitdr = function(m.formula,fdata,level=0.95,start=vector(),verbose=FALSE) {
 #' @export
 #'
 #' @examples
-fitdr_replicates= function(m.formula,fdata,effectColumns,concColumn,level=0.95,start=vector(),verbose=F) {
+fitdr_replicates= function(m.formula,fdata,effectColumns,concColumn,level=0.95,start=vector(),verbose=F,debug=F) {
   quo_concColumn = enquo(concColumn)
   data.logged = fdata %>% dplyr::mutate(logconc := log10(!! quo_concColumn))
-  data.long = data.logged %>% tidyr::gather(replicateID,effect,effectColumns)
-  data.summ = data.long %>% dplyr::group_by(logconc) %>% dplyr::summarise(mean = mean(effect,na.rm=T),n=n(),sd = sd(effect,na.rm=T))
-  m.formula = as.formula(stringr::str_replace(deparse(m.formula),'effect','mean'))
-  browser()
-  data.fit = fitdr(m.formula,data.summ,level=level,start=start,verbose=verbose)
+  data.long = data.logged %>% tidyr::gather(replicateID,effect,effectColumns) %>%
+    arrange(desc(logconc))
+  #data.summ = data.long %>% dplyr::group_by(logconc) %>% dplyr::summarise(mean = mean(effect,na.rm=T),n=n(),sd = sd(effect,na.rm=T))
+
+  #m.formula = as.formula(stringr::str_replace(deparse(m.formula),'effect','mean'))
+
+  data.fit = fitdr(m.formula,data.long,level=level,start=start,verbose=verbose,debug=debug)
   data.fit$data.long = data.long
   data.fit$nreplicates = length(effectColumns)
   data.fit

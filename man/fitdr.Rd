@@ -5,7 +5,7 @@
 \title{Dose Response curve fit}
 \usage{
 fitdr(m.formula, fdata, level = 0.95, start = vector(),
-  verbose = FALSE)
+  verbose = FALSE, debug = FALSE)
 }
 \arguments{
 \item{m.formula}{Model formula.}

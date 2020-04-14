@@ -23,6 +23,22 @@ calc_xrange = function(m.formula,fdata) {
 }
 
 
+#' calculate ECx
+#'
+#' @param slope slope of the hill curve
+#' @param ec50 Effective concentration at 50%
+#'
+#' @return ECx value
+#' @export
+#'
+#' @examples
+calc_ecx = function(x,slope,ec50) {
+  ecx = ((x/(100-x))^(1/slope)) * ec50
+  names(ecx) = paste0("ec",as.character(x))
+  ecx
+}
+
+
 
 
 

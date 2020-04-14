@@ -10,6 +10,18 @@
 #' @export
 #'
 #' @examples
+#'drc.formula = effect ~ 100 / (1 + 10^((logEC50-logconc) * slope))
+#'rdata = as_tibble(
+#'data.frame(
+#'    conc=c(0.1,1,10,100,1000,5000),
+#'    replicateA=c(1,12,27,65,88,100),
+#'    replicateB=c(2,16,21,62,81,100),
+#'    replicateC=c(4,15,21,61,85,96)
+#'  ))
+#'
+#'fitObjectRep = fitdr_replicates(drc.formula,rdata,2:4,conc)
+#'ntc = findNTC(fitObjectRep)
+#'
 findNTC = function(bendrObj) {
   upperCI = bendrObj$plot.data$curve.predict + bendrObj$plot.data$ci.values
   lowerCI = bendrObj$plot.data$curve.predict - bendrObj$plot.data$ci.values

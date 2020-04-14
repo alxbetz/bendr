@@ -4,7 +4,8 @@
 \alias{calc_ci}
 \title{Calculate the confidence intervals}
 \usage{
-calc_ci(m.formula, x.values, curvefit, curve.predict, dof, level = 0.95)
+calc_ci(m.formula, x.values, curvefit, curve.predict, dof, level = 0.95,
+  debug = FALSE)
 }
 \arguments{
 \item{m.formula}{model formula}
@@ -18,6 +19,9 @@ calc_ci(m.formula, x.values, curvefit, curve.predict, dof, level = 0.95)
 \item{dof}{degrees of freedom for the inverse student's t distribution ; default is (# measurements)-2}
 
 \item{level}{Level of confidence interval to use (0.95 by default). [0,1]}
+}
+\value{
+Confidence interval values for all concentrations in x.values
 }
 \description{
 confidence intervals are calculated beyond the concentrations, at which measurements were taken

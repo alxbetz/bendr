@@ -17,7 +17,8 @@ Imports:
     nls2,
     tibble,
     purrr,
-    rlang
+    rlang,
+    nlstools
 Suggests: 
     knitr,
     rmarkdown,

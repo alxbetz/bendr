@@ -115,6 +115,6 @@ rdata = as_tibble(
   ))
 
 fitObjectRep = fitdr_replicates(drc.formula,rdata,2:4,conc)
-pRep = plot_replicate_drc(fitObjectRep)
+pRep = plot_single_drc(fitObjectRep)
 pRep
 ```
