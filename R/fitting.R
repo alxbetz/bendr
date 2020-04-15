@@ -185,6 +185,7 @@ fitdr = function(m.formula,fdata,level=0.95,start=vector(),verbose=FALSE,debug=F
 #' @param debug print confidence interval calculation intermediate  results
 #'
 #' @return
+#' @importFrom tidyr drop_na
 #' @export
 #'
 #' @examples
@@ -192,6 +193,7 @@ fitdr_replicates= function(m.formula,fdata,effectColumns,concColumn,level=0.95,s
   quo_concColumn = enquo(concColumn)
   data.logged = fdata %>% dplyr::mutate(logconc := log10(!! quo_concColumn))
   data.long = data.logged %>% tidyr::gather(replicateID,effect,effectColumns) %>%
+    drop_na() %>%
     arrange(desc(logconc))
   data.fit = fitdr(m.formula,data.long,level=level,start=start,verbose=verbose,debug=debug)
   data.fit$data.long = data.long
