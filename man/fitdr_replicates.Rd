@@ -8,7 +8,21 @@ fitdr_replicates(m.formula, fdata, effectColumns, concColumn,
   level = 0.95, start = vector(), verbose = F, debug = F)
 }
 \arguments{
-\item{verbose}{}
+\item{m.formula}{model formula}
+
+\item{fdata}{dataframe with data to fit}
+
+\item{effectColumns}{effect column names or indices in data frame}
+
+\item{concColumn}{concentration column name in dataframe}
+
+\item{level}{confidence level}
+
+\item{start}{starting values}
+
+\item{verbose}{print fitting intermediate results}
+
+\item{debug}{print confidence interval calculation intermediate  results}
 }
 \description{
 Dose response curve fit with replicates

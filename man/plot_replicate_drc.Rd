@@ -7,7 +7,7 @@
 plot_replicate_drc(fitObject)
 }
 \arguments{
-\item{fitObject}{}
+\item{fitObject}{bendr fit object}
 }
 \description{
 Plot a single dose response curve with standard deviation of replicates

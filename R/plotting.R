@@ -21,7 +21,7 @@ plot_single_drc = function(fitObject) {
 
 #' Plot a single dose response curve with standard deviation of replicates
 #'
-#' @param fitObject
+#' @param fitObject bendr fit object
 #'
 #' @return
 #' @import ggplot2

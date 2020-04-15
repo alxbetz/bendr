@@ -7,13 +7,21 @@
 calc_ecx(x, slope, ec50)
 }
 \arguments{
+\item{x}{desired effective concentration level (ECx)}
+
 \item{slope}{slope of the hill curve}
 
-\item{ec50}{Effective concentration at 50%}
+\item{ec50}{Effective concentration at 50 percent}
 }
 \value{
 ECx value
 }
 \description{
 calculate ECx
+}
+\examples{
+x = 10
+slope = 2
+ec50 = 12
+calc_ecx(x,slope,ec50)
 }

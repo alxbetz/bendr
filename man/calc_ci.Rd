@@ -19,6 +19,8 @@ calc_ci(m.formula, x.values, curvefit, curve.predict, dof, level = 0.95,
 \item{dof}{degrees of freedom for the inverse student's t distribution ; default is (# measurements)-2}
 
 \item{level}{Level of confidence interval to use (0.95 by default). [0,1]}
+
+\item{debug}{Print and plot intermediate results for debugging}
 }
 \value{
 Confidence interval values for all concentrations in x.values

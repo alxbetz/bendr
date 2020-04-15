@@ -19,7 +19,7 @@ test_that("basic dose response curve fitting works", {
 })
 
 test_that("dose response curve fitting works with replicates", {
-
+  require(tibble)
   drc.formula = effect ~ 100 / (1 + 10^((logEC50-logconc) * slope))
   rdata = as_tibble(
     data.frame(
@@ -30,7 +30,7 @@ test_that("dose response curve fitting works with replicates", {
     ))
 
   fitObjectRep = fitdr_replicates(drc.formula,rdata,2:4,conc)
-  pRep = plot_replicate_drc(fitObjectRep)
+  pRep = plot_single_drc(fitObjectRep)
 
   if(class(pRep)[2] == 'ggplot') {
     succeed()
@@ -39,6 +39,7 @@ test_that("dose response curve fitting works with replicates", {
 
 
 test_that("multiple response curve fitting works", {
+  require(tibble)
   drc.formula = effect ~ 100 / (1 + 10^((logEC50-logconc) * slope))
   mdata = as_tibble(
     data.frame(
@@ -56,19 +57,20 @@ test_that("multiple response curve fitting works", {
 })
 
 test_that("non-toxic concentration finding works", {
+  require(tibble)
   drc.formula = effect ~ 100 / (1 + 10^((logEC50-logconc) * slope))
   rdata = as_tibble(
     data.frame(
       conc=c(0.1,1,10,100,1000,5000),
-      replicateA=c(1,12,27,65,88,100),
-      replicateB=c(2,16,21,62,81,100),
-      replicateC=c(4,15,21,61,85,96)
+      replicateA=rev(c(1,12,27,65,88,100)),
+      replicateB=rev(c(2,16,21,62,81,100)),
+      replicateC=rev(c(4,15,21,61,85,96))
     ))
 
-  fitObjectRep = fitdr_replicates(drc.formula,rdata,2:4,conc)
-  ntc = findNTC(fitObjectRep)
+  fitObjectRep = bendr::fitdr_replicates(drc.formula,rdata,2:4,conc)
+  ntc = bendr::findNTC(fitObjectRep)
 
-  if(class(ntc) == 'numeric' && ntc < 5000 && ntc > 0.1) {
+  if((class(ntc) == 'numeric' && ntc < 5000 && ntc > 0.1) || is.na(ntc)) {
     succeed()
   }
 })

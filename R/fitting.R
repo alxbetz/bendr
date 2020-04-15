@@ -40,6 +40,8 @@ nlsfit = function(m.formula,start,fdata) {
 #' degrees of freedom for the inverse student's t distribution ; default is (# measurements)-2
 #' @param level
 #' Level of confidence interval to use (0.95 by default). [0,1]
+#' @param debug
+#' Print and plot intermediate results for debugging
 #'
 #' @return
 #' Confidence interval values for all concentrations in x.values
@@ -94,7 +96,9 @@ calc_ci = function(m.formula,x.values,curvefit,curve.predict,dof,level = 0.95,de
 #' @param start
 #' initial parameter values for the dose response fitting. c(logEC50,slope)
 #' @param verbose
-#' logical, prints intermediate results if true
+#' logical, prints intermediate results from fitting
+#' @param debug
+#' Print and plot intermediate results from confidence interval calculation
 #'
 #' @return
 #' @importFrom nlstools confint2
@@ -168,15 +172,17 @@ fitdr = function(m.formula,fdata,level=0.95,start=vector(),verbose=FALSE,debug=F
 }
 
 
+
 #' Dose response curve fit with replicates
 #'
-#' @param m.formula
-#' @param fdata
-#' @param effectColumns
-#' @param concColumn
-#' @param level
-#' @param start
-#' @param verbose
+#' @param m.formula model formula
+#' @param fdata dataframe with data to fit
+#' @param effectColumns effect column names or indices in data frame
+#' @param concColumn concentration column name in dataframe
+#' @param level confidence level
+#' @param start starting values
+#' @param verbose print fitting intermediate results
+#' @param debug print confidence interval calculation intermediate  results
 #'
 #' @return
 #' @export
@@ -187,10 +193,6 @@ fitdr_replicates= function(m.formula,fdata,effectColumns,concColumn,level=0.95,s
   data.logged = fdata %>% dplyr::mutate(logconc := log10(!! quo_concColumn))
   data.long = data.logged %>% tidyr::gather(replicateID,effect,effectColumns) %>%
     arrange(desc(logconc))
-  #data.summ = data.long %>% dplyr::group_by(logconc) %>% dplyr::summarise(mean = mean(effect,na.rm=T),n=n(),sd = sd(effect,na.rm=T))
-
-  #m.formula = as.formula(stringr::str_replace(deparse(m.formula),'effect','mean'))
-
   data.fit = fitdr(m.formula,data.long,level=level,start=start,verbose=verbose,debug=debug)
   data.fit$data.long = data.long
   data.fit$nreplicates = length(effectColumns)

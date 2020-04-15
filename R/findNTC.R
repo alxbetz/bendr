@@ -1,7 +1,7 @@
 #' Find the non-toxic concentration.
 #'
 #' If you use the result of this calculation in your research, please cite Stadnicka-Michalak et al.
-#' DOI: 10.14573/altex.1701231
+#'
 #' @param bendrObj
 #' A bendr result object
 #'
@@ -10,6 +10,7 @@
 #' @export
 #'
 #' @examples
+#' require(tibble)
 #'drc.formula = effect ~ 100 / (1 + 10^((logEC50-logconc) * slope))
 #'rdata = as_tibble(
 #'data.frame(
@@ -33,8 +34,12 @@ findNTC = function(bendrObj) {
   ## NtC upper
   # find concentration at which the upper confidence interval falls below
   # 100
+  uci100 = upperCI > 100
+  if(!any(uci100)) {
+    return(NA)
+  }
 
-  inds = max(which(upperCI > 100))
+  inds = max(which(uci100))
   Effect_NtC_upper = 100 - curve.predict[inds]
   if (Effect_NtC_upper > 0){
     NtC_upper = 10^(log.concentration[inds])

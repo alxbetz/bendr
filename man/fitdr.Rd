@@ -16,7 +16,9 @@ fitdr(m.formula, fdata, level = 0.95, start = vector(),
 
 \item{start}{initial parameter values for the dose response fitting. c(logEC50,slope)}
 
-\item{verbose}{logical, prints intermediate results if true}
+\item{verbose}{logical, prints intermediate results from fitting}
+
+\item{debug}{Print and plot intermediate results from confidence interval calculation}
 }
 \description{
 Dose Response curve fit

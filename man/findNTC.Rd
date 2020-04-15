@@ -14,9 +14,9 @@ The absolute (non-logged) non-toxic concentration value
 }
 \description{
 If you use the result of this calculation in your research, please cite Stadnicka-Michalak et al.
-DOI: 10.14573/altex.1701231
 }
 \examples{
+require(tibble)
 drc.formula = effect ~ 100 / (1 + 10^((logEC50-logconc) * slope))
 rdata = as_tibble(
 data.frame(
