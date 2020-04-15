@@ -22,7 +22,7 @@ nrep = ncol(edata) - 1
 names(edata) <- c('conc',paste0('rep', as.character(seq(nrep))))
 edataf = edata %>% dplyr::filter(conc > 0)
 if(nrep > 1) {
-  fo = bendr::fitdr_replicates(drc.formula,edataf,2:nrep,conc,debug=T)
+  fo = bendr::fitdr_replicates(drc.formula,edataf,2:nrep,conc,debug=F)
 } else {
   edatafLog = edataf %>% dplyr::mutate(logconc = log10(conc))
   fo = bendr::fitdr(drc.formula,edatafLog)
@@ -33,6 +33,7 @@ sum_idx = c(
   'ec50',
   'ec50.ci',
   'ec10',
+  'ec10.ci',
   'slope',
   'slope.ci',
   'ntc',
@@ -43,7 +44,10 @@ est_vals = tibble(params = names(vals),values=vals)
 
 
 bname = sub(pattern = "(.*)\\..*$", replacement = "\\1", basename(fname))
-po = bendr::plot_single_drc(fo)
+po = bendr::plot_single_drc(fo) +
+  xlab('log10 Concentration [mg/L]') +
+  ylab('Effect [%]') +
+  theme_light
 ggsave(filename = paste0(bname,'.png'),po)
 saveRDS(object = fo,file = paste0(bname,'.RDS'))
 write_csv(fo$plot.data,paste0(bname,"_plotdata.csv"))

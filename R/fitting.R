@@ -144,7 +144,7 @@ fitdr = function(m.formula,fdata,level=0.95,start=vector(),verbose=FALSE,debug=F
   m.formula.ec10 = drc.formula = effect ~ 100 / (1 + 10^(((logEC50-logconc) * slope) - log10(0.1/0.9)))
   curvefit.ec10 = nlsfit(m.formula.ec10,start=start,fdata = fdata)
   ci.par.ec10 = confint2(curvefit.ec10)
-  colnames(ci.par) = c('lower','upper')
+  colnames(ci.par.ec10) = c('lower','upper')
   ec10.ci = 10^ci.par.ec10['logEC50',]
 
 
