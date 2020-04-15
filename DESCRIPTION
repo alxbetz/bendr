@@ -1,7 +1,7 @@
 Package: bendr
 Type: Package
 Title: Fits dose-response curves
-Version: 0.1.0
+Version: 0.3.0
 Author: Alexander Betz, Anze Zupanic
 Maintainer: Alexander Betz <alexander.betz@gmail.com>
 Description: Fit one or more dose response curves.

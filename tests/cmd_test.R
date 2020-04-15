@@ -48,6 +48,7 @@ po = bendr::plot_single_drc(fo) +
   xlab('log10 Concentration [mg/L]') +
   ylab('Effect [%]') +
   theme_light
+
 ggsave(filename = paste0(bname,'.png'),po)
 saveRDS(object = fo,file = paste0(bname,'.RDS'))
 write_csv(fo$plot.data,paste0(bname,"_plotdata.csv"))
