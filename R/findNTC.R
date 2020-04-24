@@ -75,7 +75,12 @@ findNTC = function(bendrObj) {
   # 1. which measured concentrations are below NtC
   # 2. does any of the effects measured at these concentrations have an effect > 10%
   # 3. if yes, select the lowest concentration that is below the NtC
-  belowNtC = bendrObj$data.long %>%
+  if(bendrObj$nreplicates == 1) {
+    dr_data = bendrObj$data
+  } else {
+    dr_dat = bendrObj$data.long
+  }
+  belowNtC = dr_data %>%
     dplyr::filter(conc < NtC,effect <= 90)
   if(nrow(belowNtC) > 0) {
     NtC = belowNtC %>% pull(conc) %>% min()

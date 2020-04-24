@@ -138,15 +138,17 @@ fitdr = function(m.formula,fdata,level=0.95,start=vector(),verbose=FALSE,debug=F
   logec50 = coefficients(curvefit)[1]
   ec50 = 10^logec50
   slope = coefficients(curvefit)[2]
-  ec10 = calc_ecx(10,slope,ec50)
-  logec10 = log10(ec10)
+  #ec10 = calc_ecx(10,slope,ec50)
+  #logec10 = log10(ec10)
   ci.par = confint2(curvefit)
   colnames(ci.par) = c('lower','upper')
   ec50.ci = 10^ci.par['logEC50',]
   slope.ci = ci.par['slope',]
 
-  m.formula.ec10 = drc.formula = effect ~ 100 / (1 + 10^(((logEC50-logconc) * slope) - log10(0.1/0.9)))
+  m.formula.ec10 = drc.formula = effect ~ 100 / (1 + 10^(((logEC50-logconc) * slope) - log10(0.9/0.1)))
   curvefit.ec10 = nlsfit(m.formula.ec10,start=start,fdata = fdata)
+  logec10 = coefficients(curvefit.ec10)[1]
+  ec10 = 10^logec10
   ci.par.ec10 = confint2(curvefit.ec10)
   colnames(ci.par.ec10) = c('lower','upper')
   ec10.ci = 10^ci.par.ec10['logEC50',]
