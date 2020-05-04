@@ -14,9 +14,10 @@ calc_xrange = function(m.formula,fdata) {
   concV = dplyr::pull(fdata,concName)
   loc = min(concV)
   hic = max(concV)
-  fext = 1.2
-  x.start = ifelse(loc > 0,loc*-fext,loc*fext)
-  x.end = ifelse(hic > 0, hic*fext,loc*-fext)
+  fext = 0.2
+  aext = (hic-loc) * fext
+  x.start = loc - aext
+  x.end = hic +aext
 
   x.values = seq(x.start,x.end,length.out=1E3)
 }
