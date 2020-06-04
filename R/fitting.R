@@ -13,9 +13,15 @@
 #'
 #' @examples
 nlsfit = function(m.formula,start,fdata) {
-  fit1 = nls2::nls2(m.formula, data = fdata,start = start, algorithm = "plinear-brute")
-  curvefit <- nls2::nls2(m.formula, data = fdata, start = coef(fit1)[1:2],
-                   algorithm = "brute-force")
+  #fit1 = nls2::nls2(m.formula, data = fdata,start = start, algorithm = "plinear-brute")
+  #curvefit <- nls2::nls2(m.formula, data = fdata, start = coef(fit1)[1:2],
+  #                 algorithm = "brute-force")
+  fit1 = nlmrt::nlxb(m.formula,
+                     start = start,
+                     trace = FALSE,
+                     data = fdata)
+  curvefit <- nls2::nls2(m.formula, data = fdata, start = fit1$coefficients,
+                         algorithm = "brute-force")
   curvefit
 }
 
