@@ -4,8 +4,8 @@
 \alias{fitdr}
 \title{Dose Response curve fit}
 \usage{
-fitdr(m.formula, fdata, level = 0.95, start = vector(),
-  verbose = FALSE, debug = FALSE)
+fitdr(m.formula, fdata, level = 0.95, ci_method = "delta",
+  start = vector(), verbose = FALSE)
 }
 \arguments{
 \item{m.formula}{Model formula.}
@@ -14,11 +14,11 @@ fitdr(m.formula, fdata, level = 0.95, start = vector(),
 
 \item{level}{Level of confidence interval to use (0.95 by default). [0,1]}
 
+\item{ci_method}{Method for computing confidence intervals ["delta","bootstrap"] default: delta}
+
 \item{start}{initial parameter values for the dose response fitting. c(logEC50,slope)}
 
-\item{verbose}{logical, prints intermediate results from fitting}
-
-\item{debug}{Print and plot intermediate results from confidence interval calculation}
+\item{verbose}{logical, prints intermediate results from fitting and print and plot intermediate results from confidence interval calculation}
 }
 \description{
 Dose Response curve fit

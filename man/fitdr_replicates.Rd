@@ -5,7 +5,7 @@
 \title{Dose response curve fit with replicates}
 \usage{
 fitdr_replicates(m.formula, fdata, effectColumns, concColumn,
-  level = 0.95, start = vector(), verbose = F, debug = F)
+  level = 0.95, start = vector(), ci_method = "delta", verbose = F)
 }
 \arguments{
 \item{m.formula}{model formula}
@@ -20,9 +20,9 @@ fitdr_replicates(m.formula, fdata, effectColumns, concColumn,
 
 \item{start}{starting values}
 
-\item{verbose}{print fitting intermediate results}
+\item{ci_method}{method for confidence interval calculation, one of ["delta","bootstrap"]}
 
-\item{debug}{print confidence interval calculation intermediate  results}
+\item{verbose}{print fitting intermediate results and confidence interval calculation intermediate  results}
 }
 \description{
 Dose response curve fit with replicates

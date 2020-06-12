@@ -12,8 +12,8 @@
 plot_single_drc = function(fitObject) {
   p = ggplot(fitObject$plot.data, aes(x=log.concentration, y=curve.predict)) +
     geom_line(aes(y = curve.predict), colour = "red") +
-    geom_line(aes(y = curve.predict + ci.values), colour = "red", linetype = 2) +
-    geom_line(aes(y = curve.predict - ci.values), colour = "red", linetype = 2) +
+    geom_line(aes(y = ci.values.upper), colour = "red", linetype = 2) +
+    geom_line(aes(y = ci.values.lower), colour = "red", linetype = 2) +
     geom_point(data=fitObject$data,ggplot2::aes_string(x=fitObject$xname,y=fitObject$yname))
 
   p
@@ -63,14 +63,14 @@ plot_multi_drc = function(fit_df,plot.layout = "single") {
   if(plot.layout == 'single') {
     p = ggplot(plotLong,aes(x=log.concentration,color=sampleID)) +
       geom_line(aes(y=curve.predict)) +
-      geom_line(aes(y=curve.predict + ci.values), linetype = 2) +
-      geom_line(aes(y=curve.predict - ci.values), linetype = 2) +
+      geom_line(aes(y=ci.values.upper), linetype = 2) +
+      geom_line(aes(y=ci.values.lower), linetype = 2) +
       geom_point(data=rawdata,aes(x=logconc,y=effect,color=sampleID))
   } else if(plot.layout == 'multi') {
     p = ggplot(plotLong,aes(x=log.concentration)) +
       geom_line(aes(y=curve.predict)) +
-      geom_line(aes(y=curve.predict + ci.values), linetype = 2) +
-      geom_line(aes(y=curve.predict - ci.values), linetype = 2) +
+      geom_line(aes(y=ci.values.upper), linetype = 2) +
+      geom_line(aes(y=ci.values.lower), linetype = 2) +
       geom_point(data=rawdata,aes(x=logconc,y=effect)) +
       facet_wrap(~ sampleID)
   } else {

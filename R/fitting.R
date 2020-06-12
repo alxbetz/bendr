@@ -26,9 +26,9 @@ nlsfit = function(m.formula,start,fdata) {
 }
 
 
-#' Calculate the confidence intervals
+#' Calculate the confidence intervals using the delta method
 #'
-#'confidence intervals are calculated beyond the concentrations, at which measurements were taken
+#'
 #'
 #'
 #' @param m.formula
@@ -40,18 +40,18 @@ nlsfit = function(m.formula,start,fdata) {
 #' @param curve.predict
 #' predicted effect values at the concentrations specified in x.values
 #' @param dof
-#' degrees of freedom for the inverse student's t distribution ; default is (# measurements)-2
+#' degrees of freedom for the inverse student's t distribution ; default is (# measurements)-(number of parameters)
 #' @param level
 #' Level of confidence interval to use (0.95 by default). [0,1]
-#' @param debug
-#' Print and plot intermediate results for debugging
+#' @param verbose
+#' Print and plot intermediate results for verboseging
 #'
 #' @return
 #' Confidence interval values for all concentrations in x.values
 #' @export
 #'
 #' @examples
-calc_ci = function(m.formula,x.values,curvefit,curve.predict,dof,level = 0.95,debug=FALSE) {
+prediction_ci = function(m.formula,x.values,curvefit,curve.predict,dof,level = 0.95,verbose=FALSE) {
 
   logEC50.value = coef(curvefit)[1]
   slope.value = coef(curvefit)[2]
@@ -68,7 +68,7 @@ calc_ci = function(m.formula,x.values,curvefit,curve.predict,dof,level = 0.95,de
   names(paramY) = nameY
   names(paramX) = nameX
   residual.jacobian = residual.jacfun(coef(curvefit), paramX, paramY)
-  if(debug) {
+  if(verbose) {
     jac_plot = ggplot(as_tibble(residual.jacobian)) + geom_point(aes(x=logEC50,y=slope))
     ggsave("./residual_jacobian.png")
   }
@@ -88,6 +88,70 @@ calc_ci = function(m.formula,x.values,curvefit,curve.predict,dof,level = 0.95,de
 
 
 
+#' Calculate parameter and prediction confidence intervals using the bootstrap
+#'
+#' @param m.formula model formula
+#' @param data data for fitting
+#' @param logC.values log concentration values for plotting
+#' @param curvefit initial model fit
+#' @param curve.predict predicted effect values from model fit
+#' @param n.boot number of bootstrap repetitions
+#' @param level confidence level
+#' @param verbose print intermediate results
+#'
+#' @return
+#' @export
+#'
+#' @examples
+bootstrap_ci = function(m.formula,data,logC.values,curvefit,curve.predict,n.boot=1000,level = 0.95,verbose=FALSE) {
+  logEC50.value = coef(curvefit)[1]
+  slope.value = coef(curvefit)[2]
+
+
+  ## arrays to hold predictiosn and parameters
+  predictions <- matrix(NA, ncol=length(logC.values), nrow=n.boot)
+  parameters <- data.frame(slope=rep(NA, n.boot), logEC50=NA, EC50=NA,EC10=NA)
+
+  predictions[1,] <- predict(curvefit, newdata=list(logconc=logC.values))
+  slope = coef(curvefit)[1]
+  EC50 = 10^logEC50.value
+  EC10 = (9^(1/slope.value)) * EC50
+  parameters[1,] <- c(coef(curvefit), EC50,EC10)
+
+  ## --- fit to bootstrap samples
+  for(i in 2:n.boot){
+    ## resample data
+    data2  <- data[sample(1:nrow(data), replace=T),]
+
+    ## fit model to resampled data
+    fit <- nls2::nls2(m.formula,
+                start = parameters[1,1:2], # use the first fit as starting value
+                data=data2)
+
+    ## store predictions and parameter values
+    predictions[i,] <- predict(fit, newdata=list(logconc=logC.values))
+    slope = coef(fit)[1]
+    EC50 = 10^(coef(fit)[2])
+    EC10 = (9^(1/slope)) * EC50
+    parameters[1,] <- c(coef(fit), EC50,EC10)
+    parameters[i,] <- c(coef(fit), EC50,EC10)
+
+  }
+
+  #list(predictions=predictions, parameters=parameters, logC.predict=logC.predict)
+  level_lower = (1-level)/2
+  level_upper = 1- level_lower
+
+  param_ci = apply(parameters,2,quantile,probs=c(level_lower,level_upper))
+  rownames(param_ci) = c("lower","upper")
+  pred_ci =  apply(predictions,2,quantile,probs=c(level_lower,level_upper))
+  rownames(pred_ci) = c("lower","upper")
+  return(list(params=param_ci,preds=pred_ci))
+}
+
+
+
+
 #' Dose Response curve fit
 #'
 #' @param m.formula
@@ -96,19 +160,20 @@ calc_ci = function(m.formula,x.values,curvefit,curve.predict,dof,level = 0.95,de
 #' Data to fit the model to.
 #' @param level
 #' Level of confidence interval to use (0.95 by default). [0,1]
+#' @param ci_method
+#' Method for computing confidence intervals ["delta","bootstrap"] default: delta
 #' @param start
 #' initial parameter values for the dose response fitting. c(logEC50,slope)
 #' @param verbose
-#' logical, prints intermediate results from fitting
-#' @param debug
-#' Print and plot intermediate results from confidence interval calculation
+#' logical, prints intermediate results from fitting and print and plot intermediate results from confidence interval calculation
+#'
 #'
 #' @return
 #' @importFrom nlstools confint2
 #' @export
 #'
 #' @examples
-fitdr = function(m.formula,fdata,level=0.95,start=vector(),verbose=FALSE,debug=FALSE) {
+fitdr = function(m.formula,fdata,level=0.95,ci_method="delta",start=vector(),verbose=FALSE) {
   responseName = all.vars(m.formula)[1]
   concName = all.vars(m.formula)[3]
   if(length(start) == 0) {
@@ -135,31 +200,56 @@ fitdr = function(m.formula,fdata,level=0.95,start=vector(),verbose=FALSE,debug=F
   xdf = data.frame(x.values)
   names(xdf) = concName
   curve.predict = predict(curvefit, newdata = xdf)
-
-  ci.values = calc_ci(m.formula,x.values,curvefit,curve.predict,dof=nrow(fdata)-2,level=level,debug=debug)
-  plot.data = data.frame(log.concentration = x.values,curve.predict = curve.predict,ci.values = ci.values)
   logec50 = coefficients(curvefit)[1]
-  ec50 = 10^logec50
   slope = coefficients(curvefit)[2]
-  #ec10 = calc_ecx(10,slope,ec50)
-  #logec10 = log10(ec10)
-  ci.par = confint2(curvefit)
-  colnames(ci.par) = c('lower','upper')
-  ec50.ci = 10^ci.par['logEC50',]
-  slope.ci = ci.par['slope',]
-
-  m.formula.ec10 = drc.formula = effect ~ 100 / (1 + 10^(((logEC50-logconc) * slope) - log10(0.9/0.1)))
-  curvefit.ec10 = nlsfit(m.formula.ec10,start=start,fdata = fdata)
-  logec10 = coefficients(curvefit.ec10)[1]
-  ec10 = 10^logec10
-  ci.par.ec10 = confint2(curvefit.ec10)
-  colnames(ci.par.ec10) = c('lower','upper')
-  ec10.ci = 10^ci.par.ec10['logEC50',]
+  ec50 = 10^logec50
+  ec10 = calc_ecx(90,slope,ec50)
 
 
-  names(ec50) = c('')
-  names(ec10) = c('')
-  names(slope) = c('')
+  if (ci_method == "delta") {
+    ci.values = prediction_ci(m.formula,x.values,curvefit,curve.predict,dof=nrow(fdata)-2,level=level,verbose=verbose)
+    #plot.data = data.frame(log.concentration = x.values,curve.predict = curve.predict,ci.values = ci.values)
+
+    #ec10 = calc_ecx(10,slope,ec50)
+    #logec10 = log10(ec10)
+    ci.par = confint2(curvefit)
+    colnames(ci.par) = c('lower','upper')
+    ec50.ci = 10^ci.par['logEC50',]
+    slope.ci = ci.par['slope',]
+
+    m.formula.ec10 = drc.formula = effect ~ 100 / (1 + 10^(((logEC50-logconc) * slope) - log10(0.9/0.1)))
+    curvefit.ec10 = nlsfit(m.formula.ec10,start=start,fdata = fdata)
+    logec10 = coefficients(curvefit.ec10)[1]
+    ec10 = 10^logec10
+    ci.par.ec10 = confint2(curvefit.ec10)
+    colnames(ci.par.ec10) = c('lower','upper')
+    ec10.ci = 10^ci.par.ec10['logEC50',]
+
+
+    names(ec50) = c('')
+    names(ec10) = c('')
+    names(slope) = c('')
+    plot.data = data.frame(log.concentration = x.values,curve.predict = curve.predict,ci.values.upper = curve.predict + ci.values,
+                           ci.values.lower = curve.predict - ci.values)
+
+  } else if (ci_method == "bootstrap") {
+
+    boot = bootstrap_ci(m.formula,data=fdata,x.values,curvefit,curve.predict,n.boot = 1000)
+    slope.ci = boot$params[,"slope"]
+    ec50.ci = boot$params[,"EC50"]
+    ec10.ci = boot$params[,"EC10"]
+    ci.values.lower = boot$preds[1,]
+    ci.values.upper = boot$preds[2,]
+    plot.data = data.frame(log.concentration = x.values,curve.predict = curve.predict,ci.values.upper = ci.values.upper,
+                           ci.values.lower = ci.values.lower)
+  } else {
+    print("Invalid confidence interval calculation method")
+    return(NA)
+  }
+
+
+
+
   list(plot.data = plot.data ,
        curve.fit=curvefit,
        confidence.level=level,
@@ -186,21 +276,21 @@ fitdr = function(m.formula,fdata,level=0.95,start=vector(),verbose=FALSE,debug=F
 #' @param concColumn concentration column name in dataframe
 #' @param level confidence level
 #' @param start starting values
-#' @param verbose print fitting intermediate results
-#' @param debug print confidence interval calculation intermediate  results
+#' @param verbose print fitting intermediate results and confidence interval calculation intermediate  results
+#' @param ci_method method for confidence interval calculation, one of ["delta","bootstrap"]
 #'
 #' @return
 #' @importFrom tidyr drop_na
 #' @export
 #'
 #' @examples
-fitdr_replicates= function(m.formula,fdata,effectColumns,concColumn,level=0.95,start=vector(),verbose=F,debug=F) {
+fitdr_replicates= function(m.formula,fdata,effectColumns,concColumn,level=0.95,start=vector(),ci_method="delta",verbose=F) {
   quo_concColumn = enquo(concColumn)
   data.logged = fdata %>% dplyr::mutate(logconc := log10(!! quo_concColumn))
   data.long = data.logged %>% tidyr::gather(replicateID,effect,effectColumns) %>%
     drop_na() %>%
     arrange(desc(logconc))
-  data.fit = fitdr(m.formula,data.long,level=level,start=start,verbose=verbose,debug=debug)
+  data.fit = fitdr(m.formula,data.long,level=level,start=start,ci_method=ci_method,verbose=verbose)
   data.fit$data.long = data.long
   data.fit$nreplicates = length(effectColumns)
   data.fit
