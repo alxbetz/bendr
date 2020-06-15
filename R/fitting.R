@@ -118,6 +118,12 @@ bootstrap_ci = function(m.formula,data,logC.values,curvefit,curve.predict,n.boot
   EC10 = (9^(1/slope.value)) * EC50
   parameters[1,] <- c(coef(curvefit), EC50,EC10)
 
+  ## --- define initial range of initial values
+  inits <- data.frame(slope = sort(c(0.5, 2)*slope.value),
+                      logEC50 = sort(c(0.5, 2)*logEC50.value))
+
+
+
   ## --- fit to bootstrap samples
   for(i in 2:n.boot){
     ## resample data
@@ -125,8 +131,10 @@ bootstrap_ci = function(m.formula,data,logC.values,curvefit,curve.predict,n.boot
 
     ## fit model to resampled data
     fit <- nls2::nls2(m.formula,
-                start = parameters[1,1:2], # use the first fit as starting value
-                data=data2)
+                      start = inits,
+                      data=data2, algorithm="grid-search",
+                      control=list(maxiter=100))
+
 
     ## store predictions and parameter values
     predictions[i,] <- predict(fit, newdata=list(logconc=logC.values))
