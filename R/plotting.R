@@ -14,7 +14,8 @@ plot_single_drc = function(fitObject) {
     geom_line(aes(y = curve.predict), colour = "red") +
     geom_line(aes(y = ci.values.upper), colour = "red", linetype = 2) +
     geom_line(aes(y = ci.values.lower), colour = "red", linetype = 2) +
-    geom_point(data=fitObject$data,ggplot2::aes_string(x=fitObject$xname,y=fitObject$yname))
+    geom_point(data=fitObject$data,ggplot2::aes_string(x=fitObject$xname,y=fitObject$yname)) +
+    ylim(-10,max(fitObject$plot.data$curve.predict)+20)
 
   p
 }

@@ -16,13 +16,29 @@ nlsfit = function(m.formula,start,fdata) {
   #fit1 = nls2::nls2(m.formula, data = fdata,start = start, algorithm = "plinear-brute")
   #curvefit <- nls2::nls2(m.formula, data = fdata, start = coef(fit1)[1:2],
   #                 algorithm = "brute-force")
-  fit1 = nlmrt::nlxb(m.formula,
-                     start = start,
-                     trace = FALSE,
-                     data = fdata)
-  curvefit <- nls2::nls2(m.formula, data = fdata, start = fit1$coefficients,
-                         algorithm = "brute-force")
-  curvefit
+  #fit1 = nlmrt::nlxb(m.formula,
+  #                   start = start,
+  #                   trace = F,
+  #                   data = fdata)
+  #curvefit <- nls2::nls2(m.formula, data = fdata, start = fit1$coefficients,
+  #                      algorithm = "brute-force")
+  #curvefit <- minpack.lm::nlsLM(m.formula, data = fdata, start = start)
+  curvefit = tryCatch(
+    {
+      minpack.lm::nlsLM(m.formula,fdata,start=start,trace=F)
+
+    }, error = function(cond) {
+      warning("Switching to grid-search")
+      inits <- data.frame(slope = sort(c(0.5, 100)*start["slope"]),
+                          logEC50 = sort(c(0.5, 3)*start["logEC50"]))
+      nls2::nls2(m.formula, data = fdata, start = inits,
+                 algorithm = "grid-search",
+                 trace=F,
+                 control=list(maxiter=100))
+    }
+  )
+
+  return(curvefit)
 }
 
 
@@ -196,7 +212,24 @@ fitdr = function(m.formula,fdata,level=0.95,ci_method="delta",start=vector(),ver
     if(dependentV[length(dependentV)] - dependentV[1] < 0 ) {
       slopeGuess = - slopeGuess
     }
-    start = c(logEC50 = median(dplyr::pull(fdata,concName)), slope = slopeGuess)
+    # if the majority of the tested concentration range is close to 100 or 0 % effect,
+    # use a linear fit through the measured points that are closest to 50% effect, instead of the median
+    meanEffect = mean(dplyr::pull(fdata,responseName))
+    repMeans = fdata %>% group_by(conc) %>%
+      summarise(effect = mean(effect),.groups="drop") %>% pull(effect)
+    if((any(repMeans > 50) && any(repMeans < 50 )) &&
+       (meanEffect > 80 || meanEffect < 20)) {
+      if(verbose) {
+        "Using linear model for EC50 guess"
+      }
+      logEC50Guess = guessEC50_lm(fdata)
+    } else {
+      logEC50Guess = median(dplyr::pull(fdata,concName))
+    }
+
+    start = c(logEC50 = logEC50Guess,slope=slopeGuess)
+
+
     if(verbose) {
       print("Initial values are")
       print(start)
@@ -213,32 +246,65 @@ fitdr = function(m.formula,fdata,level=0.95,ci_method="delta",start=vector(),ver
   ec50 = 10^logec50
   ec10 = calc_ecx(90,slope,ec50)
 
+  #define default values for confidence intervals
+  slope.ci = NA
+  ec50.ci = NA
+  ec10.ci = NA
+  ci.values.lower = NA
+  ci.values.upper = NA
+
 
   if (ci_method == "delta") {
-    ci.values = prediction_ci(m.formula,x.values,curvefit,curve.predict,dof=nrow(fdata)-2,level=level,verbose=verbose)
+    tryCatch({
+      ci.values = prediction_ci(m.formula,x.values,curvefit,curve.predict,dof=nrow(fdata)-2,level=level,verbose=verbose)
+      ci.values.lower = curve.predict - ci.values
+      ci.values.upper = curve.predict + ci.values
+      },
+    error= function(cond) {
+      message("Failed to compute prediction bands")
+      message("Original error message:")
+      message(cond)
+
+    }
+      )
+
     #plot.data = data.frame(log.concentration = x.values,curve.predict = curve.predict,ci.values = ci.values)
 
     #ec10 = calc_ecx(10,slope,ec50)
     #logec10 = log10(ec10)
-    ci.par = confint2(curvefit)
-    colnames(ci.par) = c('lower','upper')
-    ec50.ci = 10^ci.par['logEC50',]
-    slope.ci = ci.par['slope',]
+    tryCatch({
+      ci.par = confint2(curvefit)
+      colnames(ci.par) = c('lower','upper')
+      ec50.ci = 10^ci.par['logEC50',]
+      slope.ci = ci.par['slope',]
 
-    m.formula.ec10 = drc.formula = effect ~ 100 / (1 + 10^(((logEC50-logconc) * slope) - log10(0.9/0.1)))
-    curvefit.ec10 = nlsfit(m.formula.ec10,start=start,fdata = fdata)
-    logec10 = coefficients(curvefit.ec10)[1]
-    ec10 = 10^logec10
-    ci.par.ec10 = confint2(curvefit.ec10)
-    colnames(ci.par.ec10) = c('lower','upper')
-    ec10.ci = 10^ci.par.ec10['logEC50',]
+      m.formula.ec10 = drc.formula = effect ~ 100 / (1 + 10^(((logEC50-logconc) * slope) - log10(0.9/0.1)))
+
+      start.ec10 = c(logEC50= as.double(log10(ec10)),slope=as.double(slope))
+      #curvefit.ec10 = nlsfit(m.formula.ec10,start=start,fdata = fdata)
+      curvefit.ec10 = nls2::nls2(m.formula, data = fdata, start = start.ec10,
+                                 algorithm = "brute-force")
+      logec10 = coefficients(curvefit.ec10)[1]
+      ec10 = 10^logec10
+      ci.par.ec10 = confint2(curvefit.ec10)
+      colnames(ci.par.ec10) = c('lower','upper')
+      ec10.ci = 10^ci.par.ec10['logEC50',]
 
 
+
+    },
+    error= function(cond) {
+      message("Failed to compute parameter confidence intervals")
+      message("Original error message:")
+      message(cond)
+    }
+    )
     names(ec50) = c('')
     names(ec10) = c('')
     names(slope) = c('')
-    plot.data = data.frame(log.concentration = x.values,curve.predict = curve.predict,ci.values.upper = curve.predict + ci.values,
-                           ci.values.lower = curve.predict - ci.values)
+
+    plot.data = data.frame(log.concentration = x.values,curve.predict = curve.predict,ci.values.upper = ci.values.upper,
+                           ci.values.lower = ci.values.lower)
 
   } else if (ci_method == "bootstrap") {
 
