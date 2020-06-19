@@ -46,7 +46,7 @@ inverse.hill = function(effect,logEC50,slope) {
 #'
 #' @examples
 extend_ci = function(fo) {
-
+  m.formula = fo$curve.fit$m$formula()
   #get concentration at which effect is 99.9%
   lox = inverse.hill(99.9,log10(fo$ec50),fo$slope)
   #generate sequence from new minimal log concentration value to previous max
@@ -57,7 +57,7 @@ extend_ci = function(fo) {
   #predict effect values along new log concentration value range
   curve.predict.xtend = predict(fo$curve.fit,newdata = data.frame(logconc=xtend_x))
   #calculate confidence interval
-  ci.values.xtend = bendr::prediction_ci(drc.formula,
+  ci.values.xtend = bendr::prediction_ci(m.formula,
                                          x.values = xtend_x,
                                          curvefit = fo$curve.fit,
                                          curve.predict = curve.predict.xtend,
