@@ -102,7 +102,7 @@ pMulti = plot_multi_drc(fo,plot.layout='multi')
 pMulti
 ```
 
-##Fitting a single dose response curve to several of replicates
+##Fitting a single dose response curve to several replicates and compute prediction bands using the delta method
 
 
 ```{r replifit}
@@ -120,7 +120,7 @@ pRep
 ```
 
 
-##Fitting a single dose response curve to several of replicates
+##Fitting a single dose response curve to several replicates and compute prediction bands with the bootstrap
 
 
 ```{r bootstrap_replifit}

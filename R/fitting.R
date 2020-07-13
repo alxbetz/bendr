@@ -77,12 +77,15 @@ prediction_ci = function(m.formula,x.values,curvefit,curve.predict,dof,level = 0
 
   # get the jacobian for all x.values
   residual.jacfun = nlmrt::model2jacfun(m.formula,coef(curvefit))
-  nameY = all.vars(m.formula)['effect']
-  nameX = all.vars(m.formula)['logconc']
+  #nameY = all.vars(m.formula)['effect']
+  #nameX = all.vars(m.formula)['logconc']
+
   paramY = list(curve.predict)
   paramX = list(x.values)
-  names(paramY) = nameY
-  names(paramX) = nameX
+  #names(paramY) = nameY
+  #names(paramX) = nameX
+  names(paramY) = "effect"
+  names(paramX) = "logconc"
   residual.jacobian = residual.jacfun(coef(curvefit), paramX, paramY)
   if(verbose) {
     jac_plot = ggplot(as_tibble(residual.jacobian)) + geom_point(aes(x=logEC50,y=slope))
@@ -198,12 +201,15 @@ bootstrap_ci = function(m.formula,data,logC.values,curvefit,curve.predict,n.boot
 #'
 #' @examples
 fitdr = function(m.formula,fdata,level=0.95,ci_method="delta",start=vector(),verbose=FALSE) {
-  responseName = all.vars(m.formula)['effect']
-  concName = all.vars(m.formula)['logconc']
+  #responseName = all.vars(m.formula)['effect']
+  #concName = all.vars(m.formula)['logconc']
+  responseName = "effect"
+  concName = "logconc"
   if(length(start) == 0) {
     #start = c(logEC50 = median(fdata$logconc), slope = diff(range(fdata$logconc))/ diff(range(fdata$effect)))
     responseV = fdata %>% dplyr::pull(responseName)
     dependentV = fdata %>% dplyr::pull(concName)
+
     #set slopeGuess to +1 if the response values are ascending and -1 if they are descending
     #slopeGuess = sign(mean(diff(responseV)))
     slopeGuess = as.double(sign(responseV[length(responseV)]-responseV[1]))
