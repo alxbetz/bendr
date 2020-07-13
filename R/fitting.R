@@ -69,16 +69,16 @@ nlsfit = function(m.formula,start,fdata) {
 #' @examples
 prediction_ci = function(m.formula,x.values,curvefit,curve.predict,dof,level = 0.95,verbose=FALSE) {
 
-  logEC50.value = coef(curvefit)[1]
-  slope.value = coef(curvefit)[2]
+  logEC50.value = coef(curvefit)['logEC50']
+  slope.value = coef(curvefit)['slope']
 
   # get the covariance matrix for the parameters
   covmatrix= vcov(curvefit)
 
   # get the jacobian for all x.values
   residual.jacfun = nlmrt::model2jacfun(m.formula,coef(curvefit))
-  nameY = all.vars(m.formula)[1]
-  nameX = all.vars(m.formula)[3]
+  nameY = all.vars(m.formula)['effect']
+  nameX = all.vars(m.formula)['logconc']
   paramY = list(curve.predict)
   paramX = list(x.values)
   names(paramY) = nameY
@@ -120,8 +120,8 @@ prediction_ci = function(m.formula,x.values,curvefit,curve.predict,dof,level = 0
 #'
 #' @examples
 bootstrap_ci = function(m.formula,data,logC.values,curvefit,curve.predict,n.boot=1000,level = 0.95,verbose=FALSE) {
-  logEC50.value = coef(curvefit)[1]
-  slope.value = coef(curvefit)[2]
+  logEC50.value = coef(curvefit)['logEC50']
+  slope.value = coef(curvefit)['slope']
 
 
   ## arrays to hold predictiosn and parameters
@@ -129,7 +129,7 @@ bootstrap_ci = function(m.formula,data,logC.values,curvefit,curve.predict,n.boot
   parameters <- data.frame(slope=rep(NA, n.boot), logEC50=NA, EC50=NA,EC10=NA)
 
   predictions[1,] <- predict(curvefit, newdata=list(logconc=logC.values))
-  slope = coef(curvefit)[1]
+  slope = coef(curvefit)['slope']
   EC50 = 10^logEC50.value
   EC10 = (9^(1/slope.value)) * EC50
   parameters[1,] <- c(coef(curvefit), EC50,EC10)
@@ -154,8 +154,8 @@ bootstrap_ci = function(m.formula,data,logC.values,curvefit,curve.predict,n.boot
 
     ## store predictions and parameter values
     predictions[i,] <- predict(fit, newdata=list(logconc=logC.values))
-    slope = coef(fit)[1]
-    EC50 = 10^(coef(fit)[2])
+    slope = coef(fit)['slope']
+    EC50 = 10^(coef(fit)['logEC50'])
     EC10 = (9^(1/slope)) * EC50
     parameters[1,] <- c(coef(fit), EC50,EC10)
     parameters[i,] <- c(coef(fit), EC50,EC10)
@@ -198,8 +198,8 @@ bootstrap_ci = function(m.formula,data,logC.values,curvefit,curve.predict,n.boot
 #'
 #' @examples
 fitdr = function(m.formula,fdata,level=0.95,ci_method="delta",start=vector(),verbose=FALSE) {
-  responseName = all.vars(m.formula)[1]
-  concName = all.vars(m.formula)[3]
+  responseName = all.vars(m.formula)['effect']
+  concName = all.vars(m.formula)['logconc']
   if(length(start) == 0) {
     #start = c(logEC50 = median(fdata$logconc), slope = diff(range(fdata$logconc))/ diff(range(fdata$effect)))
     responseV = fdata %>% dplyr::pull(responseName)
@@ -241,8 +241,8 @@ fitdr = function(m.formula,fdata,level=0.95,ci_method="delta",start=vector(),ver
   xdf = data.frame(x.values)
   names(xdf) = concName
   curve.predict = predict(curvefit, newdata = xdf)
-  logec50 = coefficients(curvefit)[1]
-  slope = coefficients(curvefit)[2]
+  logec50 = coefficients(curvefit)['logEC50']
+  slope = coefficients(curvefit)['slope']
   ec50 = 10^logec50
   ec10 = calc_ecx(90,slope,ec50)
 
@@ -284,7 +284,7 @@ fitdr = function(m.formula,fdata,level=0.95,ci_method="delta",start=vector(),ver
       #curvefit.ec10 = nlsfit(m.formula.ec10,start=start,fdata = fdata)
       curvefit.ec10 = nls2::nls2(m.formula, data = fdata, start = start.ec10,
                                  algorithm = "brute-force")
-      logec10 = coefficients(curvefit.ec10)[1]
+      logec10 = coefficients(curvefit.ec10)['logEC50']
       ec10 = 10^logec10
       ci.par.ec10 = confint2(curvefit.ec10)
       colnames(ci.par.ec10) = c('lower','upper')
@@ -397,8 +397,8 @@ fitdr_multi= function(m.formula,fdata,effectColumns,concColumn) {
   data.fit = data.long %>% dplyr::group_by(sampleID) %>% tidyr::nest() %>%
     dplyr::mutate(m.fit = purrr::map(data,fitdr,m.formula = m.formula)) %>%
     dplyr::mutate(
-      ec50=purrr::map_dbl(m.fit,function(mod) 10^(coefficients(mod$curve.fit)[1])),
-      slope=purrr::map_dbl(m.fit,function(mod) coefficients(mod$curve.fit)[2]),
+      ec50=purrr::map_dbl(m.fit,function(mod) 10^(coefficients(mod$curve.fit)['logEC50'])),
+      slope=purrr::map_dbl(m.fit,function(mod) coefficients(mod$curve.fit)['slope']),
       aic=purrr::map_dbl(m.fit,function(mod) mod$aic))
   data.fit
 }
