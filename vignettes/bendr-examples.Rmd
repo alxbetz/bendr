@@ -123,7 +123,7 @@ pRep
 ##Fitting a single dose response curve to several replicates and compute prediction bands with the bootstrap
 
 
-```{r bootstrap_replifit}
+```{r bootstrap_replifit,eval=FALSE}
 rdata = as_tibble(
   data.frame(
     conc=c(0.1,1,10,100,1000,5000),

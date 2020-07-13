@@ -5,10 +5,7 @@
 #' @param fdata
 #' dataframe with concentration values
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' @return vector of concentration values for plotting
 calc_xrange = function(m.formula,fdata) {
   concName = intersect(all.vars(m.formula),colnames(fdata))[2]
   concV = dplyr::pull(fdata,concName)
@@ -28,23 +25,18 @@ calc_xrange = function(m.formula,fdata) {
 #' @param logEC50 parameter; log10(EC50)
 #' @param slope parameter; slope
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' @return concentration for given effect
 inverse.hill = function(effect,logEC50,slope) {
   return(logEC50 - (log10((100/effect)-1)/slope))
 }
 
 
-#' Extends the plot data up to 99%
+#' Extends the plot data up to the concentration where the lower confidence interval is at 99 percent
 #'
 #' @param fo bendr fit object
 #'
-#' @return
+#' @return dataframe
 #' @export
-#'
-#' @examples
 extend_ci = function(fo) {
   m.formula = fo$curve.fit$m$formula()
   #get concentration at which effect is 99.9%
@@ -96,10 +88,8 @@ calc_ecx = function(x,slope,ec50) {
 #'
 #' @param df dataframe with dose response data. The first column needs to be the concentration.
 #'
-#' @return
+#' @return long dataframe
 #' @export
-#'
-#' @examples
 cleanAndPivot = function(df) {
   if(is.na(df) || nrow(df) == 0 || ncol(df) <2) {
     return(NA)
@@ -127,16 +117,21 @@ cleanAndPivot = function(df) {
 
 }
 
+
 #' Calculate quantile difference of a vector
 #'
-#' @param x
+#' @param x vector of numeric values
+#' @param lo lower quantile [0,1]
+#' @param hi upper quantile [0,1]
 #'
-#' @return
+#' @return difference between lo and hi
 #' @export
 #'
 #' @examples
+#' qd = qdiff(seq(200),0.05,0.95)
+#'
 qdiff = function(x,lo,hi) {
-  if(is.na(x)) {
+  if(length(x) < 2 && is.na(x)) {
     NA
   }
   qlo = quantile(x,lo)
@@ -145,14 +140,12 @@ qdiff = function(x,lo,hi) {
   qdiff
 }
 
-#' Guess the logEC50 by fitting a linear model through the datapoints closest to 50% effect concentration
+#' Guess the logEC50 by fitting a linear model through the datapoints closest to 50 percent effect concentration
 #'
 #' @param df dataframe containing effect and log concentration columns
 #'
 #' @return guess for EC50 value
 #' @export
-#'
-#' @examples
 guessEC50_lm = function(df) {
   df = df %>% arrange(logconc)
   if("replicateID" %in% colnames(df)) {

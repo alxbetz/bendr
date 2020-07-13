@@ -7,8 +7,19 @@
 qdiff(x, lo, hi)
 }
 \arguments{
-\item{x}{}
+\item{x}{vector of numeric values}
+
+\item{lo}{lower quantile [0,1]}
+
+\item{hi}{upper quantile [0,1]}
+}
+\value{
+difference between lo and hi
 }
 \description{
 Calculate quantile difference of a vector
+}
+\examples{
+qd = qdiff(seq(200),0.05,0.95)
+
 }

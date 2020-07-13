@@ -9,6 +9,9 @@ cleanAndPivot(df)
 \arguments{
 \item{df}{dataframe with dose response data. The first column needs to be the concentration.}
 }
+\value{
+long dataframe
+}
 \description{
 Remove NA columns from dataframe and convert to long format
 }

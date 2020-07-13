@@ -10,8 +10,6 @@
 #' @return
 #' nls2 fit object
 #' @export
-#'
-#' @examples
 nlsfit = function(m.formula,start,fdata) {
   #fit1 = nls2::nls2(m.formula, data = fdata,start = start, algorithm = "plinear-brute")
   #curvefit <- nls2::nls2(m.formula, data = fdata, start = coef(fit1)[1:2],
@@ -65,8 +63,6 @@ nlsfit = function(m.formula,start,fdata) {
 #' @return
 #' Confidence interval values for all concentrations in x.values
 #' @export
-#'
-#' @examples
 prediction_ci = function(m.formula,x.values,curvefit,curve.predict,dof,level = 0.95,verbose=FALSE) {
 
   logEC50.value = coef(curvefit)['logEC50']
@@ -118,10 +114,7 @@ prediction_ci = function(m.formula,x.values,curvefit,curve.predict,dof,level = 0
 #' @param level confidence level
 #' @param verbose print intermediate results
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' @return list: bootstrapped confidence intervals for prediction parameters and prediction bands
 bootstrap_ci = function(m.formula,data,logC.values,curvefit,curve.predict,n.boot=1000,level = 0.95,verbose=FALSE) {
   logEC50.value = coef(curvefit)['logEC50']
   slope.value = coef(curvefit)['slope']
@@ -195,11 +188,9 @@ bootstrap_ci = function(m.formula,data,logC.values,curvefit,curve.predict,n.boot
 #' logical, prints intermediate results from fitting and print and plot intermediate results from confidence interval calculation
 #'
 #'
-#' @return
+#' @return list: fit object
 #' @importFrom nlstools confint2
 #' @export
-#'
-#' @examples
 fitdr = function(m.formula,fdata,level=0.95,ci_method="delta",start=vector(),verbose=FALSE) {
   #responseName = all.vars(m.formula)['effect']
   #concName = all.vars(m.formula)['logconc']
@@ -359,11 +350,9 @@ fitdr = function(m.formula,fdata,level=0.95,ci_method="delta",start=vector(),ver
 #' @param verbose print fitting intermediate results and confidence interval calculation intermediate  results
 #' @param ci_method method for confidence interval calculation, one of ["delta","bootstrap"]
 #'
-#' @return
+#' @return list: fit object
 #' @importFrom tidyr drop_na
 #' @export
-#'
-#' @examples
 fitdr_replicates= function(m.formula,fdata,effectColumns,concColumn,level=0.95,start=vector(),ci_method="delta",verbose=F) {
   quo_concColumn = enquo(concColumn)
   data.logged = fdata %>% dplyr::mutate(logconc := log10(!! quo_concColumn))
@@ -390,12 +379,10 @@ fitdr_replicates= function(m.formula,fdata,effectColumns,concColumn,level=0.95,s
 #' @param concColumn
 #' name of the concentration column; this parameter is lazily evaluated, so do not use quotes
 #'
-#' @return
+#' @return data frame: fit objects and corresponding summaries
 #' @import rlang
 #' @import dplyr
 #' @export
-#'
-#' @examples
 fitdr_multi= function(m.formula,fdata,effectColumns,concColumn) {
   quo_concColumn = enquo(concColumn)
   data.logged = fdata %>% dplyr::mutate(logconc := log10(!! quo_concColumn))

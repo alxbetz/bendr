@@ -13,6 +13,9 @@ inverse.hill(effect, logEC50, slope)
 
 \item{slope}{parameter; slope}
 }
+\value{
+concentration for given effect
+}
 \description{
 Inverse hill function
 }

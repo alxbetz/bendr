@@ -2,13 +2,16 @@
 % Please edit documentation in R/utility.R
 \name{extend_ci}
 \alias{extend_ci}
-\title{Extends the plot data up to 99%}
+\title{Extends the plot data up to the concentration where the lower confidence interval is at 99 percent}
 \usage{
 extend_ci(fo)
 }
 \arguments{
 \item{fo}{bendr fit object}
 }
+\value{
+dataframe
+}
 \description{
-Extends the plot data up to 99%
+Extends the plot data up to the concentration where the lower confidence interval is at 99 percent
 }

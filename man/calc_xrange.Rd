@@ -11,6 +11,9 @@ calc_xrange(m.formula, fdata)
 
 \item{fdata}{dataframe with concentration values}
 }
+\value{
+vector of concentration values for plotting
+}
 \description{
 Calculate a vector of x-values for plotting
 }

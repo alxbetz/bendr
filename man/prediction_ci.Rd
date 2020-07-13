@@ -4,8 +4,15 @@
 \alias{prediction_ci}
 \title{Calculate the confidence intervals using the delta method}
 \usage{
-prediction_ci(m.formula, x.values, curvefit, curve.predict, dof,
-  level = 0.95, verbose = FALSE)
+prediction_ci(
+  m.formula,
+  x.values,
+  curvefit,
+  curve.predict,
+  dof,
+  level = 0.95,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{m.formula}{model formula}

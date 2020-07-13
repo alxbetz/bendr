@@ -18,10 +18,11 @@ Imports:
     tibble,
     purrr,
     rlang,
-    nlstools
+    nlstools,
+    minpack.lm
 Suggests: 
     knitr,
     rmarkdown,
     testthat (>= 2.1.0)
 VignetteBuilder: knitr
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1

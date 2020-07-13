@@ -4,8 +4,16 @@
 \alias{fitdr_replicates}
 \title{Dose response curve fit with replicates}
 \usage{
-fitdr_replicates(m.formula, fdata, effectColumns, concColumn,
-  level = 0.95, start = vector(), ci_method = "delta", verbose = F)
+fitdr_replicates(
+  m.formula,
+  fdata,
+  effectColumns,
+  concColumn,
+  level = 0.95,
+  start = vector(),
+  ci_method = "delta",
+  verbose = F
+)
 }
 \arguments{
 \item{m.formula}{model formula}
@@ -23,6 +31,9 @@ fitdr_replicates(m.formula, fdata, effectColumns, concColumn,
 \item{ci_method}{method for confidence interval calculation, one of ["delta","bootstrap"]}
 
 \item{verbose}{print fitting intermediate results and confidence interval calculation intermediate  results}
+}
+\value{
+list: fit object
 }
 \description{
 Dose response curve fit with replicates

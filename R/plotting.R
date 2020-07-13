@@ -4,11 +4,9 @@
 #' @param fitObject
 #' drfit result object
 #'
-#' @return
+#' @return ggplot object
 #' @import ggplot2
 #' @export
-#'
-#' @examples
 plot_single_drc = function(fitObject) {
   p = ggplot(fitObject$plot.data, aes(x=log.concentration, y=curve.predict)) +
     geom_line(aes(y = curve.predict), colour = "red") +
@@ -24,11 +22,9 @@ plot_single_drc = function(fitObject) {
 #'
 #' @param fitObject bendr fit object
 #'
-#' @return
+#' @return ggplot object
 #' @import ggplot2
 #' @export
-#'
-#' @examples
 plot_replicate_drc = function(fitObject) {
   p = plot_single_drc(fitObject) +
     geom_errorbar(data=fitObject$data,aes(x=logconc,ymin=mean-sd, ymax=mean+sd), width=.1, position=position_dodge(0.1),inherit.aes = FALSE)
@@ -50,8 +46,6 @@ plot_replicate_drc = function(fitObject) {
 #' @import dplyr
 #' @import ggplot2
 #' @export
-#'
-#' @examples
 plot_multi_drc = function(fit_df,plot.layout = "single") {
   plotdata = fit_df %>%
     dplyr::pull(m.fit) %>%
@@ -59,7 +53,7 @@ plot_multi_drc = function(fit_df,plot.layout = "single") {
   names(plotdata) = fit_df %>% dplyr::pull(sampleID)
   plotLong = dplyr::bind_rows(plotdata,.id = "sampleID")
 
-  rawdata = fit_df %>% dplyr::select(sampleID,data) %>% tidyr::unnest()
+  rawdata = fit_df %>% dplyr::select(sampleID,data) %>% tidyr::unnest("data")
 
   if(plot.layout == 'single') {
     p = ggplot(plotLong,aes(x=log.concentration,color=sampleID)) +

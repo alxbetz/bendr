@@ -9,6 +9,9 @@ plot_single_drc(fitObject)
 \arguments{
 \item{fitObject}{drfit result object}
 }
+\value{
+ggplot object
+}
 \description{
 Plot a single dose response curve
 }

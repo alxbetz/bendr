@@ -4,8 +4,16 @@
 \alias{bootstrap_ci}
 \title{Calculate parameter and prediction confidence intervals using the bootstrap}
 \usage{
-bootstrap_ci(m.formula, data, logC.values, curvefit, curve.predict,
-  n.boot = 1000, level = 0.95, verbose = FALSE)
+bootstrap_ci(
+  m.formula,
+  data,
+  logC.values,
+  curvefit,
+  curve.predict,
+  n.boot = 1000,
+  level = 0.95,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{m.formula}{model formula}
@@ -23,6 +31,9 @@ bootstrap_ci(m.formula, data, logC.values, curvefit, curve.predict,
 \item{level}{confidence level}
 
 \item{verbose}{print intermediate results}
+}
+\value{
+list: bootstrapped confidence intervals for prediction parameters and prediction bands
 }
 \description{
 Calculate parameter and prediction confidence intervals using the bootstrap

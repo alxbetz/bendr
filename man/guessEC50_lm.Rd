@@ -2,7 +2,7 @@
 % Please edit documentation in R/utility.R
 \name{guessEC50_lm}
 \alias{guessEC50_lm}
-\title{Guess the logEC50 by fitting a linear model through the datapoints closest to 50% effect concentration}
+\title{Guess the logEC50 by fitting a linear model through the datapoints closest to 50 percent effect concentration}
 \usage{
 guessEC50_lm(df)
 }
@@ -13,5 +13,5 @@ guessEC50_lm(df)
 guess for EC50 value
 }
 \description{
-Guess the logEC50 by fitting a linear model through the datapoints closest to 50% effect concentration
+Guess the logEC50 by fitting a linear model through the datapoints closest to 50 percent effect concentration
 }

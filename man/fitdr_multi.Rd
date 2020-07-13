@@ -16,6 +16,9 @@ and an arbitrary number of columns corresponding to effects}
 
 \item{concColumn}{name of the concentration column; this parameter is lazily evaluated, so do not use quotes}
 }
+\value{
+data frame: fit objects and corresponding summaries
+}
 \description{
 Fit multiple dose response curves
 }
