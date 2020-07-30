@@ -31,7 +31,7 @@ sudo apt-get install libssh2-1 libssh2-1-dev
 sudo yum install libssh2
 ```
 ##### macOS
-First install Homebrew, a package manager for OS X
+First install Homebrew, a package manager for macOS
 ```bash
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" < /dev/null 2> /dev/null
 ```
