@@ -1,14 +1,14 @@
 
-#Installation
+# Installation
 
-##Via github
+## Via github
 
 1. Make sure that devtools is installed
 
 ```R
 install.packages('devtools')
 ```
-####Windows users only:
+#### Windows users only:
 there is a known bug that R freezes when installing the package 'BH' automatically, as a dependency of ggplot. Therefore, install it manually by running the the following command first.
 ```R
 install.packages('BH')
@@ -22,8 +22,8 @@ devtools::install_github('alxbetz/bendr')
 ```
 
 
-##Troubleshooting
-###libssh2 is missing
+## Troubleshooting
+### libssh2 is missing
 ##### Linux 
 install libssh2 via your preferred package manager, e.g.:
 ```bash
@@ -42,7 +42,7 @@ then install libssh2 via homebrew
 brew install libssh2
 ```
 
-#####Windows
+##### Windows
 update the 'git2r' package:
 `update.packages('git2r'))`
 
