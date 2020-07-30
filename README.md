@@ -48,5 +48,5 @@ update the 'git2r' package:
 
 # Usage
 
-
+You can find a usage example [here](https://alxbetz.github.io/bendr/bendr-examples.html)
 
