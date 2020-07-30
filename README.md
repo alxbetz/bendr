@@ -9,7 +9,7 @@
 install.packages('devtools')
 ```
 #### Windows users only:
-there is a known bug that R freezes when installing the package 'BH' automatically, as a dependency of ggplot. Therefore, install it manually by running the the following command first.
+There is a known bug that R freezes when installing the package 'BH' automatically, as a dependency of ggplot. Therefore, you need to install it manually by running the the following command first.
 ```R
 install.packages('BH')
 ```
@@ -45,5 +45,8 @@ brew install libssh2
 ##### Windows
 update the 'git2r' package:
 `update.packages('git2r'))`
+
+# Usage
+
 
 
